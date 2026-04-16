@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Working files
+temporary screenshots/
+test-*.mjs
+/tmp/
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# Vercel
+.vercel
+
+# Source material / intake (not part of the deployed site)
+*.zip
+Merchant Website Intake Form.csv.zip
+cokies_cookery_bar_content_brief.md
+71f5afaa-d40d-4546-a66c-3056e9241e21.JPG
+82feffd0-318a-4463-929f-8a67b97512c7.JPG
+dcb300f4-a709-4631-8e0e-aa09256d7c18.JPG
+e87dfca7-64f3-4e98-8158-8061d24de02a.JPG
+eed83afe-d89f-460d-a919-fb4e71768cec.JPG
+WhatsApp-Image-2026-04-14-at-9.56.53-AM-Nelly-Koroma-_1_.svg

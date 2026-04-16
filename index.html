@@ -1,0 +1,3315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cokie's Cookery & Bar — Freetown, Sierra Leone</title>
+<meta name="description" content="One stop spot for locally home-cooked meals, barbecues and grills alongside refreshing cocktails, mocktails and smoothies. 1 Pademba Road, Freetown.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- GSAP for scroll animations -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+  :root {
+    --gold: #C6A84B;
+    --gold-light: #D4BC6A;
+    --gold-dark: #A68A2E;
+    --gold-muted: rgba(198, 168, 75, 0.15);
+    --black: #1A1916;
+    --black-rich: #201F1C;
+    --black-card: #272520;
+    --black-elevated: #2E2C27;
+    --cream: #F5F0E8;
+    --cream-dark: #E8E0D0;
+    --warm-gray: #8A8578;
+    --text-primary: #F5F0E8;
+    --text-secondary: rgba(245, 240, 232, 0.72);
+    --text-muted: rgba(245, 240, 232, 0.42);
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Outfit', -apple-system, sans-serif;
+
+    --ease-smooth: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-dark) var(--black);
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--black);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--gold);
+    color: var(--black);
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
+
+  /* ─── CUSTOM CURSOR ─── */
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s var(--ease-smooth), opacity 0.15s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: transform 0.4s var(--ease-smooth), opacity 0.4s, width 0.3s, height 0.3s;
+    opacity: 0.4;
+  }
+  .cursor-ring.hovering {
+    width: 64px;
+    height: 64px;
+    opacity: 0.7;
+    border-color: var(--gold-light);
+  }
+
+  @media (pointer: coarse) {
+    .cursor-dot, .cursor-ring { display: none; }
+  }
+
+  /* ─── PRELOADER ─── */
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .preloader-logo {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0;
+  }
+  .preloader-line {
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  /* ─── NAVIGATION ─── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.5s, padding 0.5s var(--ease-smooth);
+  }
+  nav.scrolled {
+    background: rgba(26, 25, 22, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 1rem 3rem;
+    border-bottom: 1px solid rgba(198, 168, 75, 0.1);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .nav-logo-img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    transition: opacity 0.3s;
+  }
+  nav.scrolled .nav-logo-img {
+    height: 40px;
+  }
+  .nav-logo-text {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+  .nav-logo-text span {
+    font-weight: 300;
+    font-size: 0.7em;
+    letter-spacing: 0.25em;
+    display: block;
+    color: var(--text-secondary);
+    margin-top: 0.15em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+    align-items: center;
+  }
+  .nav-links a {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+    position: relative;
+    padding: 0.25rem 0;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 0.4s var(--ease-smooth);
+  }
+  .nav-links a:hover, .nav-links a:focus-visible {
+    color: var(--gold);
+  }
+  .nav-links a:hover::after, .nav-links a:focus-visible::after {
+    width: 100%;
+  }
+  .nav-cta {
+    font-family: var(--font-body) !important;
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.2em !important;
+    text-transform: uppercase !important;
+    color: var(--black) !important;
+    background: var(--gold);
+    padding: 0.75rem 1.8rem !important;
+    border: 1px solid var(--gold);
+    transition: background 0.3s, color 0.3s, transform 0.3s var(--ease-smooth) !important;
+    cursor: pointer;
+  }
+  .nav-cta:hover {
+    background: transparent;
+    color: var(--gold) !important;
+    transform: translateY(-1px);
+  }
+  .nav-cta::after { display: none !important; }
+
+  /* Mobile menu */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1002;
+  }
+  .menu-toggle span {
+    width: 28px;
+    height: 1px;
+    background: var(--gold);
+    transition: transform 0.4s var(--ease-smooth), opacity 0.3s;
+    display: block;
+  }
+  .menu-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-toggle.active span:nth-child(2) { opacity: 0; }
+  .menu-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease-smooth);
+  }
+  .mobile-menu.active { opacity: 1; pointer-events: all; }
+  .mobile-menu a {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .menu-toggle { display: flex; }
+    nav { padding: 1.2rem 1.5rem; }
+  }
+
+  /* ─── HERO SECTION ─── */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(198, 168, 75, 0.1) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(198, 168, 75, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(198, 168, 75, 0.03) 0%, transparent 70%),
+      linear-gradient(180deg, #1A1916 0%, #222019 50%, #1A1916 100%);
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(198, 168, 75, 0.06) 0%, transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+  }
+  @keyframes heroGlow {
+    0% { opacity: 0.4; transform: scale(1) translate(0, 0); }
+    100% { opacity: 1; transform: scale(1.2) translate(2%, -3%); }
+  }
+  /* Floating particles canvas */
+  #heroParticles {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hero-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(26,25,22,0.6) 100%);
+    pointer-events: none;
+  }
+  .hero-corners {
+    position: absolute;
+    inset: 3rem;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .hero-corners::before, .hero-corners::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-color: rgba(198, 168, 75, 0.2);
+    border-style: solid;
+  }
+  .hero-corners::before {
+    top: 0; left: 0;
+    border-width: 1px 0 0 1px;
+  }
+  .hero-corners::after {
+    bottom: 0; right: 0;
+    border-width: 0 1px 1px 0;
+  }
+  .hero-corner-tr, .hero-corner-bl {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-color: rgba(198, 168, 75, 0.2);
+    border-style: solid;
+  }
+  .hero-corner-tr {
+    top: 0; right: 0;
+    border-width: 1px 1px 0 0;
+  }
+  .hero-corner-bl {
+    bottom: 0; left: 0;
+    border-width: 0 0 1px 1px;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 0 2rem;
+    max-width: 900px;
+  }
+  .hero-overline {
+    font-family: var(--font-body);
+    font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+    font-weight: 300;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .hero-title .line {
+    display: block;
+    overflow: hidden;
+  }
+  .hero-title .line-inner {
+    display: block;
+    transform: translateY(100%);
+  }
+  .hero-title .line:nth-child(1) {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    color: var(--gold);
+  }
+  .hero-title .line:nth-child(2) {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-family: var(--font-body);
+    font-weight: 200;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-top: 0.8rem;
+  }
+  .hero-subtitle {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    max-width: 620px;
+    margin: 2.5rem auto 0;
+    opacity: 0;
+  }
+  .hero-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 2.5rem auto;
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .hero-ctas {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 2.5rem;
+    opacity: 0;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .hero-scroll span {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .hero-scroll .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+    50% { opacity: 1; transform: scaleY(1); }
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 1rem 2.5rem;
+    border: 1px solid var(--gold);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.4s, color 0.4s, transform 0.3s var(--ease-smooth);
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--black);
+  }
+  .btn-primary:hover, .btn-primary:focus-visible {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-outline {
+    background: transparent;
+    color: var(--gold);
+  }
+  .btn-outline:hover, .btn-outline:focus-visible {
+    background: var(--gold);
+    color: var(--black);
+    transform: translateY(-2px);
+  }
+  .btn-outline:active { transform: translateY(0); }
+
+  /* ─── SECTION UTILITIES ─── */
+  section {
+    position: relative;
+  }
+  .section-pad {
+    padding: clamp(5rem, 12vh, 10rem) clamp(1.5rem, 5vw, 6rem);
+  }
+  .section-narrow {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-overline {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+  .section-desc {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 560px;
+  }
+  .gold-line {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 2rem 0;
+  }
+
+  /* ─── ABOUT / STORY SECTION ─── */
+  .about {
+    background: var(--black);
+    overflow: hidden;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(3rem, 6vw, 8rem);
+    align-items: center;
+  }
+  .about-visual {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+  }
+  .about-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.85) contrast(1.05);
+    transition: transform 8s var(--ease-smooth);
+  }
+  .about-visual:hover img {
+    transform: scale(1.05);
+  }
+  .about-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,10,8,0.5) 0%, transparent 40%),
+                linear-gradient(to right, rgba(198,168,75,0.05) 0%, transparent 60%);
+    mix-blend-mode: multiply;
+  }
+  .about-accent-box {
+    position: absolute;
+    bottom: -1.5rem;
+    right: -1.5rem;
+    width: 120px;
+    height: 120px;
+    border: 1px solid var(--gold);
+    opacity: 0.3;
+  }
+  .about-text {
+    padding: 2rem 0;
+  }
+  .about-text blockquote {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text-primary);
+    border-left: 2px solid var(--gold);
+    padding-left: 1.5rem;
+    margin-top: 2rem;
+  }
+  .about-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(198, 168, 75, 0.15);
+  }
+  .stat-item .stat-number {
+    font-family: var(--font-display);
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-item .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+  @media (max-width: 900px) {
+    .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .about-visual { max-height: 400px; }
+    .about-accent-box { display: none; }
+  }
+
+  /* ─── EXPERIENCE SECTION (What We Offer) ─── */
+  .experience {
+    background: var(--black-rich);
+    overflow: hidden;
+  }
+  .experience-header {
+    text-align: center;
+    margin-bottom: clamp(3rem, 6vh, 5rem);
+  }
+  .experience-header .section-desc {
+    margin: 0 auto;
+  }
+  .experience-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .exp-card {
+    position: relative;
+    background: linear-gradient(145deg, var(--black-card) 0%, var(--black-elevated) 100%);
+    border: 1px solid rgba(198, 168, 75, 0.1);
+    padding: 3rem 2.5rem;
+    transition: transform 0.5s var(--ease-smooth), border-color 0.5s, box-shadow 0.5s;
+    overflow: hidden;
+    cursor: default;
+  }
+  .exp-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .exp-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(198, 168, 75, 0.25);
+    box-shadow: 0 8px 40px rgba(198, 168, 75, 0.06);
+  }
+  .exp-card:hover::before { opacity: 1; }
+  .exp-card-icon {
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+  .exp-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+  .exp-card p {
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+  .exp-card-number {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 300;
+    color: rgba(198, 168, 75, 0.06);
+    line-height: 1;
+  }
+  @media (max-width: 900px) {
+    .experience-cards { grid-template-columns: 1fr; }
+  }
+
+  /* ─── DAILY MENU SECTION ─── */
+  .menu-section {
+    background: linear-gradient(180deg, #2A2721 0%, #1E1D1A 100%);
+    overflow: hidden;
+    position: relative;
+    padding-top: clamp(6rem, 14vh, 12rem) !important;
+    padding-bottom: clamp(6rem, 14vh, 12rem) !important;
+  }
+  .menu-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.3;
+  }
+  .menu-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.3;
+  }
+  .menu-header {
+    text-align: center;
+    margin-bottom: clamp(3rem, 6vh, 5rem);
+  }
+  .menu-header .section-title {
+    font-size: clamp(3rem, 6vw, 5rem);
+  }
+  .menu-header .section-desc { margin: 0 auto; }
+
+  /* Day tabs */
+  .menu-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .menu-tab {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.8rem;
+    background: rgba(198, 168, 75, 0.04);
+    border: 1px solid rgba(198, 168, 75, 0.2);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.3s var(--ease-smooth);
+  }
+  .menu-tab:hover, .menu-tab:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-1px);
+  }
+  .menu-tab.active {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(198, 168, 75, 0.25);
+  }
+
+  /* Menu content panels */
+  .menu-panels { position: relative; }
+  .menu-panel {
+    display: none;
+    animation: fadeInMenu 0.5s var(--ease-out);
+  }
+  .menu-panel.active { display: block; }
+  @keyframes fadeInMenu {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .menu-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+  .menu-category {
+    margin-bottom: 2.5rem;
+  }
+  .menu-category h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(198, 168, 75, 0.15);
+  }
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.85rem 0.75rem;
+    border-bottom: 1px solid rgba(245, 240, 232, 0.06);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .menu-item:hover {
+    background: rgba(198, 168, 75, 0.06);
+  }
+  .menu-item.selected {
+    background: rgba(198, 168, 75, 0.08);
+    border-bottom-color: rgba(198, 168, 75, 0.25);
+  }
+  .menu-item.selected:hover {
+    background: rgba(198, 168, 75, 0.14);
+  }
+  .menu-item.selected::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gold);
+  }
+  .menu-item.selected .menu-item-name,
+  .menu-item.selected .menu-item-price {
+    color: var(--gold);
+  }
+  .menu-item-name {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .menu-item-add {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(198, 168, 75, 0.3);
+    background: transparent;
+    color: var(--gold);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    flex-shrink: 0;
+  }
+  .menu-item-add:hover {
+    background: var(--gold);
+    color: var(--black);
+    transform: scale(1.1);
+  }
+  .menu-item-add.added {
+    background: var(--gold);
+    color: var(--black);
+  }
+  .menu-item-price {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--gold-light);
+    white-space: nowrap;
+    margin-left: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .menu-layout { grid-template-columns: 1fr; }
+  }
+
+  /* ─── ORDER PANEL (slides in from right) ─── */
+  .order-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 100vw;
+    height: 100vh;
+    background: var(--black-card);
+    border-left: 1px solid rgba(198, 168, 75, 0.15);
+    z-index: 2000;
+    transform: translateX(100%);
+    transition: transform 0.5s var(--ease-smooth);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .order-panel.open { transform: translateX(0); }
+  .order-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,8,0.7);
+    z-index: 1999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .order-panel-overlay.open { opacity: 1; pointer-events: all; }
+
+  .order-header {
+    padding: 2rem;
+    border-bottom: 1px solid rgba(198, 168, 75, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .order-header h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--gold);
+  }
+  .order-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s;
+  }
+  .order-close:hover { color: var(--gold); }
+
+  .order-items {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    overflow-y: auto;
+  }
+  .order-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 3rem 0;
+    font-style: italic;
+  }
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(245, 240, 232, 0.04);
+  }
+  .order-item-info {
+    flex: 1;
+  }
+  .order-item-name {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+  }
+  .order-item-price {
+    font-size: 0.75rem;
+    color: var(--gold-light);
+  }
+  .order-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .qty-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(198, 168, 75, 0.3);
+    background: transparent;
+    color: var(--gold);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .qty-btn:hover {
+    background: var(--gold);
+    color: var(--black);
+  }
+  .qty-value {
+    font-size: 0.85rem;
+    min-width: 1.5rem;
+    text-align: center;
+    color: var(--text-primary);
+  }
+
+  .order-form {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid rgba(198, 168, 75, 0.1);
+  }
+  .order-form label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 0.4rem;
+    margin-top: 1rem;
+  }
+  .order-form label:first-child { margin-top: 0; }
+  .order-form input,
+  .order-form textarea {
+    width: 100%;
+    background: var(--black-elevated);
+    border: 1px solid rgba(198, 168, 75, 0.12);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .order-form input:focus,
+  .order-form textarea:focus {
+    border-color: var(--gold);
+  }
+  .order-form textarea { resize: vertical; min-height: 70px; }
+
+  .order-total {
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--gold);
+    border-top: 1px solid rgba(198, 168, 75, 0.15);
+  }
+  .order-submit {
+    margin: 1rem 2rem 2rem;
+  }
+  .order-submit .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .order-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background: var(--gold);
+    border: none;
+    border-radius: 50%;
+    color: var(--black);
+    cursor: pointer;
+    z-index: 1998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s var(--ease-smooth);
+    box-shadow: 0 4px 24px rgba(198, 168, 75, 0.3);
+  }
+  .order-fab:hover { transform: scale(1.08); }
+  .order-fab:active { transform: scale(0.96); }
+  .order-fab-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 22px;
+    height: 22px;
+    background: var(--black);
+    color: var(--gold);
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--gold);
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.3s, transform 0.3s var(--ease-smooth);
+  }
+  .order-fab-count.visible { opacity: 1; transform: scale(1); }
+
+  /* ─── GALLERY SECTION ─── */
+  .gallery {
+    background: var(--black-rich);
+    overflow: hidden;
+  }
+  .gallery-header {
+    text-align: center;
+    margin-bottom: clamp(2rem, 5vh, 4rem);
+  }
+  .gallery-marquee {
+    display: flex;
+    gap: 1.5rem;
+    animation: marquee 30s linear infinite;
+  }
+  .gallery-marquee-wrapper {
+    overflow: hidden;
+  }
+  .gallery-item {
+    flex-shrink: 0;
+    width: 400px;
+    height: 520px;
+    position: relative;
+    overflow: hidden;
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.8) contrast(1.05) saturate(0.9);
+    transition: transform 6s var(--ease-smooth), filter 1s;
+  }
+  .gallery-item:hover img {
+    transform: scale(1.08);
+    filter: brightness(0.9) contrast(1.05) saturate(1);
+  }
+  .gallery-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,10,8,0.6) 0%, transparent 50%);
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-400px * 5 - 1.5rem * 5)); }
+  }
+
+  /* ─── REVIEWS SECTION ─── */
+  .reviews {
+    background: var(--black);
+    overflow: hidden;
+  }
+  .reviews-header {
+    text-align: center;
+    margin-bottom: clamp(2rem, 5vh, 4rem);
+  }
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .review-card {
+    background: var(--black-card);
+    border: 1px solid rgba(198, 168, 75, 0.06);
+    padding: 2.5rem;
+    position: relative;
+    transition: transform 0.4s var(--ease-smooth), border-color 0.4s;
+    overflow: hidden;
+  }
+  .review-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .review-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(198, 168, 75, 0.15);
+  }
+  .review-card:hover::before { opacity: 1; }
+  .review-stars {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .review-star {
+    color: var(--gold);
+    width: 16px;
+    height: 16px;
+  }
+  .review-text {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+  .review-author {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .review-quote-mark {
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    font-family: var(--font-display);
+    font-size: 5rem;
+    color: rgba(198, 168, 75, 0.06);
+    line-height: 1;
+  }
+  @media (max-width: 768px) {
+    .reviews-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── VISIT SECTION ─── */
+  .visit {
+    background: var(--black-rich);
+    overflow: hidden;
+  }
+  .visit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(3rem, 6vw, 6rem);
+  }
+  .visit-info h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+    margin-top: 2.5rem;
+  }
+  .visit-info h3:first-of-type { margin-top: 0; }
+  .hours-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .hours-table tr {
+    border-bottom: 1px solid rgba(245, 240, 232, 0.04);
+  }
+  .hours-table td {
+    padding: 0.6rem 0;
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--text-secondary);
+  }
+  .hours-table td:last-child {
+    text-align: right;
+    color: var(--text-primary);
+  }
+  .visit-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 0;
+  }
+  .visit-contact-item i {
+    color: var(--gold);
+    width: 20px;
+    flex-shrink: 0;
+  }
+  .visit-contact-item a,
+  .visit-contact-item span {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .visit-contact-item a:hover { color: var(--gold); }
+
+  .visit-tips {
+    padding: 2.5rem;
+    background: var(--black-card);
+    border: 1px solid rgba(198, 168, 75, 0.08);
+  }
+  .visit-tips h3 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--gold);
+    margin-bottom: 2rem;
+  }
+  .tip-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(245, 240, 232, 0.04);
+    align-items: flex-start;
+  }
+  .tip-item:last-child { border-bottom: none; }
+  .tip-icon {
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    opacity: 0.7;
+  }
+  .tip-item p {
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  .tip-item strong { color: var(--text-primary); font-weight: 500; }
+
+  @media (max-width: 900px) {
+    .visit-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid rgba(198, 168, 75, 0.08);
+    padding: clamp(3rem, 6vh, 5rem) clamp(1.5rem, 5vw, 6rem);
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 3rem;
+  }
+  .footer-brand .nav-logo {
+    margin-bottom: 1.5rem;
+    display: inline-block;
+  }
+  .footer-brand p {
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 320px;
+  }
+  .footer-col h4 {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+  }
+  .footer-col a {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.3rem 0;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .footer-col a:hover { color: var(--gold); }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 3rem auto 0;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(198, 168, 75, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-bottom p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .footer-socials {
+    display: flex;
+    gap: 1rem;
+  }
+  .footer-socials a {
+    color: var(--text-muted);
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .footer-socials a:hover { color: var(--gold); }
+
+  @media (max-width: 768px) {
+    .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  /* ─── REVEAL ANIMATIONS ─── */
+  .reveal { opacity: 0; transform: translateY(40px); }
+  .reveal-left { opacity: 0; transform: translateX(-40px); }
+  .reveal-right { opacity: 0; transform: translateX(40px); }
+  .reveal-scale { opacity: 0; transform: scale(0.95); }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal, .reveal-left, .reveal-right, .reveal-scale {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .gallery-marquee { animation: none; }
+  }
+
+  /* ─── HORIZONTAL RULE ORNAMENT ─── */
+  .ornament-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 3rem 0;
+  }
+  .ornament-divider .line {
+    flex: 1;
+    max-width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.3;
+  }
+  .ornament-divider .diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    opacity: 0.5;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     COMPREHENSIVE RESPONSIVE STYLES
+     ═══════════════════════════════════════════════════ */
+
+  /* ─── TABLET (max 1024px) ─── */
+  @media (max-width: 1024px) {
+    .section-pad {
+      padding: clamp(3.5rem, 8vh, 7rem) clamp(1.5rem, 4vw, 3rem);
+    }
+    .hero-content { max-width: 700px; }
+    .hero-corners { inset: 2rem; }
+    .hero-corners::before, .hero-corners::after,
+    .hero-corner-tr, .hero-corner-bl { width: 40px; height: 40px; }
+    .about-stats { gap: 2rem; }
+    .stat-item .stat-number { font-size: 2.2rem; }
+    .exp-card { padding: 2.5rem 2rem; }
+    .gallery-item { width: 300px; height: 400px; }
+    .review-card { padding: 2rem; }
+    .visit-tips { padding: 2rem; }
+  }
+
+  /* ─── SMALL TABLET / LARGE PHONE (max 768px) ─── */
+  @media (max-width: 768px) {
+    .section-pad {
+      padding: clamp(3rem, 7vh, 5rem) 1.25rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 7vw, 2.8rem);
+    }
+    .section-overline {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+    }
+
+    /* Hero */
+    .hero { min-height: 100svh; }
+    .hero-logo { height: 80px !important; margin-bottom: 1.5rem !important; }
+    .hero-overline {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-title .line:nth-child(1) { font-size: clamp(2.8rem, 12vw, 4.5rem); }
+    .hero-title .line:nth-child(2) {
+      font-size: clamp(0.85rem, 3vw, 1.2rem);
+      letter-spacing: 0.2em;
+      margin-top: 0.5rem;
+    }
+    .hero-subtitle { font-size: 1rem; line-height: 1.7; margin-top: 1.5rem; }
+    .hero-subtitle br { display: none; }
+    .hero-divider { margin: 1.5rem auto; }
+    .hero-ctas {
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 2rem;
+    }
+    .hero-ctas .btn { width: 100%; max-width: 280px; text-align: center; }
+    .hero-corners { inset: 1.25rem; }
+    .hero-corners::before, .hero-corners::after,
+    .hero-corner-tr, .hero-corner-bl { width: 30px; height: 30px; }
+    .hero-scroll { bottom: 2rem; }
+
+    /* Nav */
+    nav { padding: 1rem 1.25rem; }
+    nav.scrolled { padding: 0.75rem 1.25rem; }
+    .nav-logo-img { height: 36px; }
+    nav.scrolled .nav-logo-img { height: 32px; }
+    .nav-logo-text { font-size: 1.1rem; }
+    .nav-logo-text span { font-size: 0.6em; }
+
+    /* Mobile menu */
+    .mobile-menu a { font-size: 2rem; }
+
+    /* Menu section */
+    .menu-section { padding-top: clamp(3rem, 8vh, 5rem) !important; padding-bottom: clamp(3rem, 8vh, 5rem) !important; }
+    .menu-header .section-title { font-size: clamp(2.2rem, 8vw, 3rem); }
+    .menu-tabs {
+      gap: 0.35rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      justify-content: flex-start;
+      padding: 0 0.25rem 0.5rem;
+      flex-wrap: nowrap;
+    }
+    .menu-tabs::-webkit-scrollbar { display: none; }
+    .menu-tabs::after {
+      content: '';
+      flex-shrink: 0;
+      width: 1rem;
+    }
+    .menu-tab {
+      font-size: 0.65rem;
+      padding: 0.65rem 1rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .menu-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+    .menu-category h3 { font-size: 1.3rem; }
+    .menu-item { padding: 0.75rem 0.5rem; }
+    .menu-item-name { font-size: 0.85rem; gap: 0.5rem; }
+    .menu-item-price { font-size: 0.75rem; }
+    .menu-item-add { width: 28px; height: 28px; font-size: 1rem; }
+
+    /* About */
+    .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .about-visual { max-height: 350px; aspect-ratio: 16/10; }
+    .about-accent-box { display: none; }
+    .about-text blockquote { font-size: 1.2rem; padding-left: 1rem; }
+    .about-stats {
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .stat-item .stat-number { font-size: 2rem; }
+
+    /* Experience */
+    .experience-cards { grid-template-columns: 1fr; gap: 1.25rem; }
+    .exp-card { padding: 2rem 1.5rem; }
+    .exp-card h3 { font-size: 1.4rem; }
+    .exp-card-number { font-size: 2.5rem; }
+
+    /* Gallery */
+    .gallery-item { width: 260px; height: 340px; }
+    .gallery-marquee { gap: 1rem; }
+
+    /* Reviews */
+    .reviews-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+    .review-card { padding: 1.75rem; }
+    .review-text { font-size: 1rem; }
+    .review-quote-mark { font-size: 3.5rem; top: 1rem; right: 1.25rem; }
+
+    /* Visit */
+    .visit-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .visit-tips { padding: 1.75rem; }
+    .visit-tips h3 { font-size: 1.3rem; }
+
+    /* Footer */
+    .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; text-align: center; gap: 1rem; }
+
+    /* Order panel */
+    .order-panel { width: 100vw; }
+    .order-fab { bottom: 1.25rem; right: 1.25rem; width: 52px; height: 52px; }
+
+    /* Buttons */
+    .btn { padding: 0.85rem 2rem; font-size: 0.65rem; }
+
+    /* Ornament */
+    .ornament-divider { padding: 2rem 0; }
+    .ornament-divider .line { max-width: 80px; }
+  }
+
+  /* ─── SMALL PHONES (max 480px) ─── */
+  @media (max-width: 480px) {
+    .section-pad { padding: 2.5rem 1rem; }
+    .section-title { font-size: clamp(1.8rem, 8vw, 2.2rem); }
+
+    /* Hero */
+    .hero-logo { height: 64px !important; margin-bottom: 1rem !important; }
+    .hero-title .line:nth-child(1) { font-size: clamp(2.5rem, 14vw, 3.5rem); }
+    .hero-title .line:nth-child(2) {
+      font-size: clamp(0.7rem, 3.5vw, 0.95rem);
+      letter-spacing: 0.15em;
+    }
+    .hero-overline { font-size: 0.55rem; letter-spacing: 0.25em; margin-bottom: 1.25rem; }
+    .hero-subtitle { font-size: 0.9rem; }
+    .hero-ctas .btn { max-width: 100%; }
+    .hero-corners { inset: 0.75rem; }
+    .hero-corners::before, .hero-corners::after,
+    .hero-corner-tr, .hero-corner-bl { width: 24px; height: 24px; }
+
+    /* Nav */
+    nav { padding: 0.75rem 1rem; }
+    .nav-logo-img { height: 30px; }
+    .nav-logo-text { font-size: 0.95rem; }
+    .nav-logo-text span { font-size: 0.55em; letter-spacing: 0.15em; }
+    .nav-logo { gap: 0.5rem; }
+
+    /* Menu */
+    .menu-section { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+    .menu-header .section-title { font-size: clamp(1.8rem, 9vw, 2.5rem); }
+    .menu-tab { font-size: 0.6rem; padding: 0.55rem 0.8rem; letter-spacing: 0.1em; }
+    .menu-category { margin-bottom: 1.5rem; }
+    .menu-category h3 { font-size: 1.15rem; margin-bottom: 0.75rem; }
+    .menu-item { padding: 0.65rem 0.25rem; }
+    .menu-item-name { font-size: 0.8rem; }
+    .menu-item-price { font-size: 0.7rem; }
+
+    /* About */
+    .about-visual { max-height: 280px; }
+    .about-text blockquote { font-size: 1.05rem; }
+    .about-stats { gap: 1rem; }
+    .stat-item .stat-number { font-size: 1.6rem; }
+    .stat-item .stat-label { font-size: 0.6rem; }
+
+    /* Experience */
+    .exp-card { padding: 1.5rem 1.25rem; }
+    .exp-card h3 { font-size: 1.2rem; }
+    .exp-card p { font-size: 0.85rem; }
+    .exp-card-number { font-size: 2rem; }
+    .exp-card-icon { margin-bottom: 1rem; }
+
+    /* Gallery */
+    .gallery-item { width: 220px; height: 280px; }
+
+    /* Reviews */
+    .review-card { padding: 1.5rem; }
+    .review-text { font-size: 0.95rem; line-height: 1.6; }
+    .review-author { font-size: 0.65rem; }
+
+    /* Visit */
+    .visit-info h3 { font-size: 1.2rem; }
+    .hours-table td { font-size: 0.8rem; padding: 0.5rem 0; }
+    .visit-contact-item a, .visit-contact-item span { font-size: 0.8rem; }
+    .visit-tips { padding: 1.25rem; }
+    .tip-item p { font-size: 0.8rem; }
+
+    /* Footer */
+    .footer-brand p { font-size: 0.8rem; }
+    .footer-col a { font-size: 0.8rem; }
+    .footer-bottom p { font-size: 0.65rem; }
+
+    /* Order panel */
+    .order-header { padding: 1.25rem; }
+    .order-header h3 { font-size: 1.25rem; }
+    .order-items { padding: 1rem 1.25rem; }
+    .order-form { padding: 1rem 1.25rem; }
+    .order-form input, .order-form textarea { font-size: 0.85rem; padding: 0.65rem 0.75rem; }
+    .order-total { padding: 0.75rem 1.25rem; font-size: 1rem; }
+    .order-submit { margin: 0.75rem 1.25rem 1.25rem; }
+
+    /* Mobile menu */
+    .mobile-menu a { font-size: 1.6rem; gap: 2rem; }
+
+    /* Preloader */
+    .preloader-logo { font-size: 2rem; }
+    .preloader-img { height: 70px !important; }
+  }
+
+  /* ─── VERY SMALL PHONES (max 360px) ─── */
+  @media (max-width: 360px) {
+    .section-pad { padding: 2rem 0.75rem; }
+    .hero-title .line:nth-child(1) { font-size: 2.2rem; }
+    .hero-title .line:nth-child(2) { font-size: 0.65rem; }
+    .hero-logo { height: 50px !important; }
+    .hero-overline { font-size: 0.5rem; }
+    .nav-logo-text { font-size: 0.85rem; }
+    .nav-logo-img { height: 26px; }
+    .menu-tab { font-size: 0.55rem; padding: 0.5rem 0.65rem; }
+    .btn { padding: 0.75rem 1.5rem; font-size: 0.6rem; }
+    .section-title { font-size: 1.6rem; }
+    .exp-card { padding: 1.25rem 1rem; }
+  }
+
+  /* ─── LANDSCAPE PHONES ─── */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .hero { min-height: 100svh; }
+    .hero-logo { height: 50px !important; margin-bottom: 0.75rem !important; }
+    .hero-title .line:nth-child(1) { font-size: 2.5rem; }
+    .hero-overline { margin-bottom: 0.75rem; }
+    .hero-subtitle { margin-top: 0.75rem; font-size: 0.85rem; }
+    .hero-divider { margin: 1rem auto; }
+    .hero-ctas { margin-top: 1rem; flex-direction: row; }
+    .hero-scroll { display: none; }
+    .hero-corners { inset: 1rem; }
+  }
+
+  /* ─── SAFE AREA SUPPORT (notched phones) ─── */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    nav {
+      padding-left: max(1.25rem, env(safe-area-inset-left));
+      padding-right: max(1.25rem, env(safe-area-inset-right));
+    }
+    .order-panel {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .order-fab {
+      bottom: max(1.25rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+      right: max(1.25rem, env(safe-area-inset-right));
+    }
+    footer {
+      padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 1rem));
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- PRELOADER -->
+<div class="preloader" id="preloader">
+  <img src="logo.svg" alt="Cokie's logo" class="preloader-img" style="height:100px;width:auto;opacity:0;">
+  <div class="preloader-logo">Cokie's</div>
+  <div class="preloader-line"></div>
+</div>
+
+<!-- NAVIGATION -->
+<nav id="mainNav">
+  <a class="nav-logo" href="#">
+    <img src="logo.svg" alt="Cokie's Cookery & Bar logo" class="nav-logo-img">
+    <div class="nav-logo-text">Cokie's<span>Cookery & Bar</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#menu">Daily Menu</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#visit">Visit</a></li>
+    <li><a href="#menu" class="nav-cta">Order Now</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about">Our Story</a>
+  <a href="#experience">Experience</a>
+  <a href="#menu">Daily Menu</a>
+  <a href="#reviews">Reviews</a>
+  <a href="#visit">Visit</a>
+  <a href="#menu" class="btn btn-primary" style="font-size:1rem; margin-top:1rem;">Order Now</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <canvas id="heroParticles"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-corners">
+    <div class="hero-corner-tr"></div>
+    <div class="hero-corner-bl"></div>
+  </div>
+  <div class="hero-content">
+    <img src="logo.svg" alt="Cokie's Cookery & Bar" class="hero-logo" style="height:120px;width:auto;margin-bottom:2rem;opacity:0;">
+    <p class="hero-overline">1 Pademba Road, Freetown &mdash; Sierra Leone</p>
+    <h1 class="hero-title">
+      <span class="line"><span class="line-inner">Cokie's</span></span>
+      <span class="line"><span class="line-inner">Cookery & Bar</span></span>
+    </h1>
+    <div class="hero-divider"></div>
+    <p class="hero-subtitle">
+      Home-cooked Sierra Leonean meals, smoky barbecues & grills,<br>
+      paired with handcrafted cocktails, mocktails and fresh smoothies.
+    </p>
+    <div class="hero-ctas">
+      <a href="#menu" class="btn btn-primary">Explore Menu</a>
+      <a href="#visit" class="btn btn-outline">Plan Your Visit</a>
+    </div>
+  </div>
+  <div class="hero-scroll" id="heroScroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- DAILY MENU -->
+<section class="menu-section section-pad" id="menu">
+  <div class="section-narrow">
+    <div class="menu-header">
+      <p class="section-overline reveal">Daily Specials</p>
+      <h2 class="section-title reveal">Our Menu</h2>
+      <p class="section-desc reveal">
+        Fresh dishes prepared daily. Select your items and place your order for
+        dine-in or delivery.
+      </p>
+    </div>
+
+    <div class="menu-tabs reveal" role="tablist">
+      <button class="menu-tab active" data-day="monday" role="tab" aria-selected="true">Monday</button>
+      <button class="menu-tab" data-day="tuesday" role="tab" aria-selected="false">Tuesday</button>
+      <button class="menu-tab" data-day="wednesday" role="tab" aria-selected="false">Wednesday</button>
+      <button class="menu-tab" data-day="thursday" role="tab" aria-selected="false">Thursday</button>
+      <button class="menu-tab" data-day="friday" role="tab" aria-selected="false">Friday</button>
+      <button class="menu-tab" data-day="saturday" role="tab" aria-selected="false">Saturday</button>
+    </div>
+
+    <div class="menu-panels">
+      <!-- MONDAY -->
+      <div class="menu-panel active" data-panel="monday">
+        <div class="menu-layout">
+          <div>
+            <div class="menu-category">
+              <h3>Main Dishes</h3>
+              <div class="menu-item" data-name="Cassava Leaves Oil" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cassava Leaves Oil</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Banga Soup" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Banga Soup</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="White Sawa Sawa" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> White Sawa Sawa</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Wanpot - Chicken (with Plantains & Salad)" data-price="120">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Wanpot &mdash; Chicken <em style="opacity:.6;font-style:normal;">w/ Plantains &amp; Salad</em></span>
+                <span class="menu-item-price">Le 120</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Wanpot - Fish (with Plantains & Salad)" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Wanpot &mdash; Fish <em style="opacity:.6;font-style:normal;">w/ Plantains &amp; Salad</em></span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Wanpot - Country Fowl (with Plantains & Salad)" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Wanpot &mdash; Country Fowl <em style="opacity:.6;font-style:normal;">w/ Plantains &amp; Salad</em></span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+              <div class="menu-item" data-name="Vegetable Pasta with Minced Meat Stew - Chicken" data-price="130">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Vegetable Pasta w/ Minced Meat Stew &mdash; Chicken</span>
+                <span class="menu-item-price">Le 130</span>
+              </div>
+              <div class="menu-item" data-name="Vegetable Pasta with Minced Meat Stew - Fish" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Vegetable Pasta w/ Minced Meat Stew &mdash; Fish</span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+              <div class="menu-item" data-name="Vegetable Pasta with Minced Meat Stew - Country Fowl" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Vegetable Pasta w/ Minced Meat Stew &mdash; Country Fowl</span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Goes With</h3>
+              <div class="menu-item" data-name="Perboiled Rice" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Perboiled Rice</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Foo Foo / Eba" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Wala Rice (Gbarabara)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Wala Rice (Gbarabara)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Short Grain (FenFen)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Short Grain (FenFen)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Plain" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Plain</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Pounded Yam" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pounded Yam</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="menu-category">
+              <h3>Extras</h3>
+              <div class="menu-item" data-name="Cowfoot" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowfoot</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Meat" data-price="30">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Meat</span>
+                <span class="menu-item-price">Le 30/piece</span>
+              </div>
+              <div class="menu-item" data-name="Fish" data-price="40">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fish</span>
+                <span class="menu-item-price">Le 40/piece</span>
+              </div>
+              <div class="menu-item" data-name="Cowbelleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowbelleh</span>
+                <span class="menu-item-price">Le 15/piece</span>
+              </div>
+              <div class="menu-item" data-name="Crab" data-price="10">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Crab</span>
+                <span class="menu-item-price">Le 10/piece</span>
+              </div>
+              <div class="menu-item" data-name="Kanda" data-price="10">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Kanda</span>
+                <span class="menu-item-price">Le 10/piece</span>
+              </div>
+              <div class="menu-item" data-name="Foo Foo / Eba (Extra)" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 20</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Everyday</h3>
+              <div class="menu-item" data-name="Beans Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Rice Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Olehleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Olehleh</span>
+                <span class="menu-item-price">Le 15/piece</span>
+              </div>
+              <div class="menu-item" data-name="Pancake" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pancake</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Rice Pap" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Pap</span>
+                <span class="menu-item-price">Le 20/bowl</span>
+              </div>
+              <div class="menu-item" data-name="Plantains" data-price="30">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Plantains</span>
+                <span class="menu-item-price">Le 30/pack</span>
+              </div>
+              <div class="menu-item" data-name="BBQ Wings" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> BBQ Wings</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+              <div class="menu-item" data-name="Huntu (Chicken Ball)" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Huntu (Chicken Ball)</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TUESDAY -->
+      <div class="menu-panel" data-panel="tuesday">
+        <div class="menu-layout">
+          <div>
+            <div class="menu-category">
+              <h3>Main Dishes</h3>
+              <div class="menu-item" data-name="Crain Crain" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Crain Crain</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="White Okra" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> White Okra</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Palmoil Stew" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Palmoil Stew</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Wanpot - Chicken (with Salad & Plantains)" data-price="130">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Wanpot &mdash; Chicken <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Plantains</em></span>
+                <span class="menu-item-price">Le 130</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Wanpot - Grill Fish/Fowl (with Salad & Plantains)" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Wanpot &mdash; Grill Fish / Fowl <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Plantains</em></span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+              <div class="menu-item" data-name="Fried Rice - Chicken (with Salad & Plantains)" data-price="130">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fried Rice &mdash; Chicken <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Plantains</em></span>
+                <span class="menu-item-price">Le 130</span>
+              </div>
+              <div class="menu-item" data-name="Fried Rice - Grill Fish/Fowl (with Salad & Plantains)" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fried Rice &mdash; Grill Fish / Fowl <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Plantains</em></span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Everyday</h3>
+              <div class="menu-item" data-name="Beans Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Rice Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Olehleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Olehleh</span>
+                <span class="menu-item-price">Le 15/bowl</span>
+              </div>
+              <div class="menu-item" data-name="Pancake" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pancake</span>
+                <span class="menu-item-price">Le 15/bowl</span>
+              </div>
+              <div class="menu-item" data-name="Rice Pap" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Pap</span>
+                <span class="menu-item-price">Le 15/bowl</span>
+              </div>
+              <div class="menu-item" data-name="Plantains" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Plantains</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+              <div class="menu-item" data-name="BBQ Wings" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> BBQ Wings</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+              <div class="menu-item" data-name="Huntu (Chicken Ball)" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Huntu (Chicken Ball)</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="menu-category">
+              <h3>Goes With</h3>
+              <div class="menu-item" data-name="Parboiled Rice" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Parboiled Rice</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Foo Foo / Eba" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Wala Rice (Gbarabara)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Wala Rice (Gbarabara)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Short Grain (FenFen)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Short Grain (FenFen)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur (Plain)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur (Plain)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Extras</h3>
+              <div class="menu-item" data-name="Cowfoot" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowfoot</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Meat" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Meat</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Kanda" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Kanda</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Cowbellen" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowbellen</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Grill Fish / Fowl (Extra)" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Grill Fish / Fowl</span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEDNESDAY -->
+      <div class="menu-panel" data-panel="wednesday">
+        <div class="menu-layout">
+          <div>
+            <div class="menu-category">
+              <h3>Traditional Dishes</h3>
+              <div class="menu-item" data-name="Lafidi" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Lafidi</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Cassava Leaves (Coconut Oil)" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cassava Leaves (Coconut Oil)</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Beans Oil" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Oil</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Obiata" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Obiata</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Cassava, Potato, Cocoa & Yam with Gravy - Chicken" data-price="130">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cassava, Potato, Cocoa &amp; Yam w/ Gravy <em style="opacity:.6;font-style:normal;">&mdash; Chicken</em></span>
+                <span class="menu-item-price">Le 130</span>
+              </div>
+              <div class="menu-item" data-name="Cassava, Potato, Cocoa & Yam with Gravy - Fish/Country Fowl" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cassava, Potato, Cocoa &amp; Yam w/ Gravy <em style="opacity:.6;font-style:normal;">&mdash; Fish / Country Fowl</em></span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Continental Dish</h3>
+              <div class="menu-item" data-name="Spaghetti Bolognese - Chicken (with Salad & Fried Plantains)" data-price="130">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Spaghetti Bolognese &mdash; Chicken <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Fried Plantains</em></span>
+                <span class="menu-item-price">Le 130</span>
+              </div>
+              <div class="menu-item" data-name="Spaghetti Bolognese - Fish/Country Fowl (with Salad & Fried Plantains)" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Spaghetti Bolognese &mdash; Fish / Country Fowl <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Fried Plantains</em></span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Extras</h3>
+              <div class="menu-item" data-name="Cow Foot" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cow Foot</span>
+                <span class="menu-item-price">Le 20/pc</span>
+              </div>
+              <div class="menu-item" data-name="Meat" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Meat</span>
+                <span class="menu-item-price">Le 20</span>
+              </div>
+              <div class="menu-item" data-name="Fish" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fish</span>
+                <span class="menu-item-price">Le 20</span>
+              </div>
+              <div class="menu-item" data-name="Cowbelleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowbelleh</span>
+                <span class="menu-item-price">Le 15</span>
+              </div>
+              <div class="menu-item" data-name="Crab" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Crab</span>
+                <span class="menu-item-price">Le 15</span>
+              </div>
+              <div class="menu-item" data-name="Kanda" data-price="10">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Kanda</span>
+                <span class="menu-item-price">Le 10</span>
+              </div>
+              <div class="menu-item" data-name="Extra Foo Foo / Eba" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Extra Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 20</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="menu-category">
+              <h3>Goes With</h3>
+              <div class="menu-item" data-name="Parboiled Rice" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Parboiled Rice</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Foo Foo / Eba" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Wala Rice (Gbarabara)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Wala Rice (Gbarabara)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Short Grain Rice (FenFen)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Short Grain Rice (FenFen)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur (Plain)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur (Plain)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Everyday Delights</h3>
+              <div class="menu-item" data-name="Beans Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Akara</span>
+                <span class="menu-item-price">Le 15/pc</span>
+              </div>
+              <div class="menu-item" data-name="Rice Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Akara</span>
+                <span class="menu-item-price">Le 15</span>
+              </div>
+              <div class="menu-item" data-name="Olehleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Olehleh</span>
+                <span class="menu-item-price">Le 15</span>
+              </div>
+              <div class="menu-item" data-name="Pancake" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pancake</span>
+                <span class="menu-item-price">Le 15</span>
+              </div>
+              <div class="menu-item" data-name="Rice Pap" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Pap</span>
+                <span class="menu-item-price">Le 15</span>
+              </div>
+              <div class="menu-item" data-name="Fried Plantains" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fried Plantains</span>
+                <span class="menu-item-price">Le 20</span>
+              </div>
+              <div class="menu-item" data-name="BBQ Wings" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> BBQ Wings</span>
+                <span class="menu-item-price">Le 50</span>
+              </div>
+              <div class="menu-item" data-name="Huntu (Chicken Ball)" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Huntu (Chicken Ball)</span>
+                <span class="menu-item-price">Le 50</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THURSDAY -->
+      <div class="menu-panel" data-panel="thursday">
+        <div class="menu-layout">
+          <div>
+            <div class="menu-category">
+              <h3>Main Dishes</h3>
+              <div class="menu-item" data-name="Potato Leaves (Palm Oil)" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Potato Leaves (Palm Oil)</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Egusi Soup" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Egusi Soup</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Groundnut Stew" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Groundnut Stew</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Achekeh - Chicken" data-price="120">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Achekeh &mdash; Chicken</span>
+                <span class="menu-item-price">Le 120</span>
+              </div>
+              <div class="menu-item" data-name="Achekeh - Fish (Grill)/Country Fowl" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Achekeh &mdash; Fish (Grill) / Country Fowl</span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+              <div class="menu-item" data-name="Vegetable Couscous - Chicken" data-price="120">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Vegetable Couscous &mdash; Chicken</span>
+                <span class="menu-item-price">Le 120</span>
+              </div>
+              <div class="menu-item" data-name="Vegetable Couscous - Fish (Grill)/Country Fowl" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Vegetable Couscous &mdash; Fish (Grill) / Country Fowl</span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Extras</h3>
+              <div class="menu-item" data-name="Cowfoot" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowfoot</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Meat" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Meat</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Fish" data-price="40">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fish</span>
+                <span class="menu-item-price">Le 40/piece</span>
+              </div>
+              <div class="menu-item" data-name="Cowbelleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowbelleh</span>
+                <span class="menu-item-price">Le 15/piece</span>
+              </div>
+              <div class="menu-item" data-name="Crab" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Crab</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Kanda" data-price="10">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Kanda</span>
+                <span class="menu-item-price">Le 10/piece</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="menu-category">
+              <h3>Goes With</h3>
+              <div class="menu-item" data-name="Parboiled Rice" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Parboiled Rice</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Foo Foo / Eba" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Wala Rice (Gbarabara)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Wala Rice (Gbarabara)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Short Grain (FenFen)" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Short Grain (FenFen)</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Plain" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Plain</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Pounded Yam" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pounded Yam</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Everyday</h3>
+              <div class="menu-item" data-name="Beans Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Rice Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Olehleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Olehleh</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Pancake" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pancake</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Rice Pap" data-price="30">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Pap</span>
+                <span class="menu-item-price">Le 30/bowl</span>
+              </div>
+              <div class="menu-item" data-name="Plan Wings" data-price="30">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Plan Wings</span>
+                <span class="menu-item-price">Le 30/pack</span>
+              </div>
+              <div class="menu-item" data-name="BBQ Wings" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> BBQ Wings</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+              <div class="menu-item" data-name="Huntu (Chicken Ball)" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Huntu (Chicken Ball)</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRIDAY -->
+      <div class="menu-panel" data-panel="friday">
+        <div class="menu-layout">
+          <div>
+            <div class="menu-category">
+              <h3>Main Dishes</h3>
+              <div class="menu-item" data-name="Stew Green" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Stew Green</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="White Bittas" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> White Bittas</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Palmoil Stew" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Palmoil Stew</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Beans Palmoil" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Palmoil</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Jollof Rice & Stew - Chicken (with Salad & Plantains)" data-price="130">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Jollof Rice &amp; Stew &mdash; Chicken <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Plantains</em></span>
+                <span class="menu-item-price">Le 130</span>
+              </div>
+              <div class="menu-item" data-name="Jollof Rice & Stew - Fish (with Salad & Plantains)" data-price="150">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Jollof Rice &amp; Stew &mdash; Fish <em style="opacity:.6;font-style:normal;">w/ Salad &amp; Plantains</em></span>
+                <span class="menu-item-price">Le 150</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Extras</h3>
+              <div class="menu-item" data-name="Cowfoot" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowfoot</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Meat" data-price="20">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Meat</span>
+                <span class="menu-item-price">Le 20/piece</span>
+              </div>
+              <div class="menu-item" data-name="Fish" data-price="40">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fish</span>
+                <span class="menu-item-price">Le 40/piece</span>
+              </div>
+              <div class="menu-item" data-name="Cowbelleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Cowbelleh</span>
+                <span class="menu-item-price">Le 15/piece</span>
+              </div>
+              <div class="menu-item" data-name="Crab" data-price="10">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Crab</span>
+                <span class="menu-item-price">Le 10/piece</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="menu-category">
+              <h3>Goes With</h3>
+              <div class="menu-item" data-name="Perboiled Rice" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Perboiled Rice</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Foo Foo / Eba" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Wala Rice (Gbarabara)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Wala Rice (Gbarabara)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Short Grain (FenFen)" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Short Grain (FenFen)</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Bulgur Plain" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Bulgur Plain</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Pounded Yam" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pounded Yam</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Everyday</h3>
+              <div class="menu-item" data-name="Beans Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Rice Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Olehleh" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Olehleh</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Pancake" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pancake</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="Rice Pap" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Rice Pap</span>
+                <span class="menu-item-price">Le 15/bowl</span>
+              </div>
+              <div class="menu-item" data-name="Plantains" data-price="30">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Plantains</span>
+                <span class="menu-item-price">Le 30/pack</span>
+              </div>
+              <div class="menu-item" data-name="BBQ Wings" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> BBQ Wings</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+              <div class="menu-item" data-name="Huntu (Chicken Ball)" data-price="50">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Huntu (Chicken Ball)</span>
+                <span class="menu-item-price">Le 50/pack</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SATURDAY -->
+      <div class="menu-panel" data-panel="saturday">
+        <div class="menu-layout">
+          <div>
+            <div class="menu-category">
+              <h3>Weekend Specials</h3>
+              <div class="menu-item" data-name="Chef's Weekend Special" data-price="0">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Chef's Weekend Special</span>
+                <span class="menu-item-price">Market Price</span>
+              </div>
+              <div class="menu-item" data-name="Grilled Seafood Platter" data-price="250">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Grilled Seafood Platter</span>
+                <span class="menu-item-price">Le 250</span>
+              </div>
+              <div class="menu-item" data-name="BBQ Meat Platter" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> BBQ Meat Platter</span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+              <div class="menu-item" data-name="Jollof Rice - Chicken" data-price="130">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Jollof Rice &mdash; Chicken</span>
+                <span class="menu-item-price">Le 130</span>
+              </div>
+              <div class="menu-item" data-name="Fried Rice - Fish/Fowl" data-price="200">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Fried Rice &mdash; Fish / Fowl</span>
+                <span class="menu-item-price">Le 200</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="menu-category">
+              <h3>Goes With</h3>
+              <div class="menu-item" data-name="Parboiled Rice" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Parboiled Rice</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Foo Foo / Eba" data-price="70">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Foo Foo / Eba</span>
+                <span class="menu-item-price">Le 70</span>
+              </div>
+              <div class="menu-item" data-name="Wala Rice" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Wala Rice</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+              <div class="menu-item" data-name="Pounded Yam" data-price="80">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Pounded Yam</span>
+                <span class="menu-item-price">Le 80</span>
+              </div>
+            </div>
+            <div class="menu-category">
+              <h3>Everyday Delights</h3>
+              <div class="menu-item" data-name="Beans Akara" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Beans Akara</span>
+                <span class="menu-item-price">Le 15/pack</span>
+              </div>
+              <div class="menu-item" data-name="BBQ Wings" data-price="15">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> BBQ Wings</span>
+                <span class="menu-item-price">Le 15</span>
+              </div>
+              <div class="menu-item" data-name="Chinchinga" data-price="10">
+                <span class="menu-item-name"><button class="menu-item-add" aria-label="Add to order">+</button> Chinchinga</span>
+                <span class="menu-item-price">Le 10/set</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ABOUT -->
+<section class="about section-pad" id="about">
+  <div class="section-narrow">
+    <div class="about-grid">
+      <div class="about-visual reveal-left">
+        <img src="restaurant-interior.jpg" alt="Inside Cokie's Cookery & Bar — orange walls, wooden furniture, and bar area" style="object-fit: cover; width: 100%; height: 100%;">
+        <div class="about-accent-box"></div>
+      </div>
+      <div class="about-text">
+        <p class="section-overline reveal">Our Story</p>
+        <h2 class="section-title reveal">Where Every<br>Meal Feels<br>Like Home</h2>
+        <div class="gold-line reveal"></div>
+        <p class="section-desc reveal">
+          Nestled at 1 Pademba Road, Freetown, Cokie's Cookery & Bar has become the beloved gathering place where authentic Sierra Leonean flavours meet warm hospitality. From freshly caught seafood grilled to perfection to our legendary spicy couscous and chicken, every dish tells the story of our rich culinary heritage.
+        </p>
+        <blockquote class="reveal">
+          "The one stop spot for locally home-cooked meals, barbecues and grills alongside refreshing cocktails, mocktails and smoothies."
+        </blockquote>
+        <div class="about-stats reveal">
+          <div class="stat-item">
+            <div class="stat-number">4.6</div>
+            <div class="stat-label">Google Rating</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">Top 10</div>
+            <div class="stat-label">Freetown Restaurants</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">#9</div>
+            <div class="stat-label">Best Lunch Spots</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORNAMENT -->
+<div class="ornament-divider">
+  <div class="line"></div>
+  <div class="diamond"></div>
+  <div class="line"></div>
+</div>
+
+<!-- EXPERIENCE -->
+<section class="experience section-pad" id="experience">
+  <div class="section-narrow">
+    <div class="experience-header">
+      <p class="section-overline reveal">The Experience</p>
+      <h2 class="section-title reveal"><em>Taste, Sip, Savour</em></h2>
+      <p class="section-desc reveal">
+        Three pillars define the Cokie's experience &mdash; each crafted with care,
+        served with soul.
+      </p>
+    </div>
+    <div class="experience-cards">
+      <div class="exp-card reveal">
+        <div class="exp-card-number">01</div>
+        <div class="exp-card-icon"><i data-lucide="flame" width="32" height="32"></i></div>
+        <h3>Home-Cooked Cuisine</h3>
+        <p>Authentic Sierra Leonean recipes prepared with locally sourced ingredients. From cassava leaves to hearty meat dishes, every plate is a celebration of tradition.</p>
+      </div>
+      <div class="exp-card reveal">
+        <div class="exp-card-number">02</div>
+        <div class="exp-card-icon"><i data-lucide="beef" width="32" height="32"></i></div>
+        <h3>BBQ & Grills</h3>
+        <p>Freshly caught seafood and prime cuts, flame-kissed over open coals. Our grill masters turn every barbecue into an unforgettable experience.</p>
+      </div>
+      <div class="exp-card reveal">
+        <div class="exp-card-number">03</div>
+        <div class="exp-card-icon"><i data-lucide="wine" width="32" height="32"></i></div>
+        <h3>Cocktails & Bar</h3>
+        <p>From handcrafted cocktails to refreshing mocktails and smoothies, our bar caters to every palate. Don't miss our happy hour specials.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery section-pad" id="gallery">
+  <div class="section-narrow">
+    <div class="gallery-header">
+      <p class="section-overline reveal">A Taste of Cokie's</p>
+      <h2 class="section-title reveal">From Our Kitchen</h2>
+    </div>
+  </div>
+  <div class="gallery-marquee-wrapper">
+    <div class="gallery-marquee">
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Jollof+Rice" alt="Jollof Rice at Cokie's"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Grilled+Seafood" alt="Grilled seafood at Cokie's"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Cocktails" alt="Cocktails at Cokie's Bar"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Couscous+%26+Chicken" alt="Spicy couscous and chicken"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=The+Venue" alt="Inside Cokie's Cookery & Bar"></div>
+      <!-- Duplicate for seamless loop -->
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Jollof+Rice" alt="Jollof Rice at Cokie's"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Grilled+Seafood" alt="Grilled seafood at Cokie's"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Cocktails" alt="Cocktails at Cokie's Bar"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=Couscous+%26+Chicken" alt="Spicy couscous and chicken"></div>
+      <div class="gallery-item"><img src="https://placehold.co/400x520/1C1917/C6A84B?text=The+Venue" alt="Inside Cokie's Cookery & Bar"></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews section-pad" id="reviews">
+  <div class="section-narrow">
+    <div class="reviews-header">
+      <p class="section-overline reveal">What People Say</p>
+      <h2 class="section-title reveal">Guest Voices</h2>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-quote-mark">&ldquo;</div>
+        <div class="review-stars">
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="review-text">Cokie's Cookery is definitely a place you must check out while in Sierra Leone. I try to stop by at least once a week. They also have a reliable delivery service.</p>
+        <p class="review-author">Google Reviewer</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-quote-mark">&ldquo;</div>
+        <div class="review-stars">
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="review-text">Delicious Sierra Leonean food! Couscous and chicken were amazing. Food is spicy FYI. Loved the atmosphere and the friendly staff made us feel right at home.</p>
+        <p class="review-author">Isabel &mdash; Google Review</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-quote-mark">&ldquo;</div>
+        <div class="review-stars">
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="review-text">The barbecue here is next level. Fresh fish grilled to perfection with that authentic Sierra Leonean spice. One of the best dining experiences in Freetown.</p>
+        <p class="review-author">Wanderlog Reviewer</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-quote-mark">&ldquo;</div>
+        <div class="review-stars">
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="review-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="review-text">Perfect spot for both casual meals and celebrations. The cocktails are creative and delicious. Truly a gem on Pademba Road that both tourists and locals adore.</p>
+        <p class="review-author">Local Regular</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISIT -->
+<section class="visit section-pad" id="visit">
+  <div class="section-narrow">
+    <div class="visit-grid">
+      <div class="visit-info">
+        <p class="section-overline reveal">Plan Your Visit</p>
+        <h2 class="section-title reveal">Find Us at<br>Pademba Road</h2>
+        <div class="gold-line reveal"></div>
+        <p class="section-desc reveal">
+          Located at 1 Pademba Road, Freetown, Cokie's is your neighbourhood destination for exceptional food and drink.
+        </p>
+
+        <h3 class="reveal">Opening Hours</h3>
+        <table class="hours-table reveal">
+          <tr><td>Monday</td><td>8:00 AM &ndash; 10:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>Shorter hours (call ahead)</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM &ndash; 10:00 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM &ndash; 10:00 PM</td></tr>
+          <tr><td>Friday</td><td>Shorter hours (call ahead)</td></tr>
+          <tr><td>Saturday</td><td>8:00 AM &ndash; 10:00 PM</td></tr>
+          <tr><td>Sunday</td><td>8:00 AM &ndash; 10:00 PM</td></tr>
+        </table>
+
+        <h3 class="reveal">Contact</h3>
+        <div class="reveal">
+          <div class="visit-contact-item">
+            <i data-lucide="map-pin" width="18" height="18"></i>
+            <span>1 Pademba Road, Freetown</span>
+          </div>
+          <div class="visit-contact-item">
+            <i data-lucide="phone" width="18" height="18"></i>
+            <a href="tel:+23272161919">+232 72 161919</a>
+          </div>
+          <div class="visit-contact-item">
+            <i data-lucide="message-circle" width="18" height="18"></i>
+            <a href="https://wa.me/23272161919" target="_blank" rel="noopener">WhatsApp Order</a>
+          </div>
+          <div class="visit-contact-item">
+            <i data-lucide="instagram" width="18" height="18"></i>
+            <a href="https://www.instagram.com/cokiescookery/" target="_blank" rel="noopener">@cokiescookery</a>
+          </div>
+          <div class="visit-contact-item">
+            <i data-lucide="facebook" width="18" height="18"></i>
+            <a href="https://www.facebook.com/Cokiescookeryandbar/" target="_blank" rel="noopener">Cokie's Cookery and Bar</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="visit-tips reveal-right">
+        <div class="visit-tips">
+          <h3>Insider Tips</h3>
+          <div class="tip-item">
+            <i data-lucide="calendar" width="18" height="18" class="tip-icon"></i>
+            <p>Visit on <strong>weekdays</strong> for a quieter dining experience</p>
+          </div>
+          <div class="tip-item">
+            <i data-lucide="clock" width="18" height="18" class="tip-icon"></i>
+            <p>Make <strong>reservations on weekends</strong> to secure your table</p>
+          </div>
+          <div class="tip-item">
+            <i data-lucide="wine" width="18" height="18" class="tip-icon"></i>
+            <p>Don't miss <strong>drink specials during happy hour</strong></p>
+          </div>
+          <div class="tip-item">
+            <i data-lucide="fish" width="18" height="18" class="tip-icon"></i>
+            <p>Try the <strong>signature seafood dishes</strong> for an authentic local taste</p>
+          </div>
+          <div class="tip-item">
+            <i data-lucide="smartphone" width="18" height="18" class="tip-icon"></i>
+            <p>Check <strong>Instagram Stories daily</strong> for the updated menu</p>
+          </div>
+          <div class="tip-item">
+            <i data-lucide="truck" width="18" height="18" class="tip-icon"></i>
+            <p>Order via <strong>WhatsApp</strong> for delivery to any location</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-logo" href="#">
+        <img src="logo.svg" alt="Cokie's Cookery & Bar logo" class="nav-logo-img" style="height:56px;">
+        <div class="nav-logo-text">Cokie's<span>Cookery & Bar</span></div>
+      </a>
+      <p>One stop spot for locally home-cooked meals, barbecues and grills alongside refreshing cocktails, mocktails and smoothies.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <a href="#about">Our Story</a>
+      <a href="#experience">Experience</a>
+      <a href="#menu">Daily Menu</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#visit">Visit</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <a href="tel:+23272161919">+232 72 161919</a>
+      <a href="https://wa.me/23272161919" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="https://www.instagram.com/cokiescookery/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.facebook.com/Cokiescookeryandbar/" target="_blank" rel="noopener">Facebook</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Cokie's Cookery & Bar. All rights reserved.</p>
+    <div class="footer-socials">
+      <a href="https://www.instagram.com/cokiescookery/" target="_blank" rel="noopener" aria-label="Instagram">
+        <i data-lucide="instagram" width="18" height="18"></i>
+      </a>
+      <a href="https://www.facebook.com/Cokiescookeryandbar/" target="_blank" rel="noopener" aria-label="Facebook">
+        <i data-lucide="facebook" width="18" height="18"></i>
+      </a>
+      <a href="https://wa.me/23272161919" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <i data-lucide="message-circle" width="18" height="18"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ORDER PANEL -->
+<div class="order-panel-overlay" id="orderOverlay"></div>
+<div class="order-panel" id="orderPanel">
+  <div class="order-header">
+    <h3>Your Order</h3>
+    <button class="order-close" id="orderClose" aria-label="Close order panel">
+      <i data-lucide="x" width="24" height="24"></i>
+    </button>
+  </div>
+  <div class="order-items" id="orderItems">
+    <p class="order-empty">Your order is empty. Tap + next to a dish to get started.</p>
+  </div>
+  <div class="order-form" id="orderForm" style="display:none;">
+    <label for="orderName">Your Name</label>
+    <input type="text" id="orderName" placeholder="Full name" autocomplete="name">
+    <label for="orderPhone">Phone Number</label>
+    <input type="tel" id="orderPhone" placeholder="+232 XX XXXXXX" autocomplete="tel">
+    <label for="orderAddress">Delivery Address</label>
+    <textarea id="orderAddress" placeholder="Street address, landmark, area..."></textarea>
+    <label for="orderNotes">Special Notes (optional)</label>
+    <textarea id="orderNotes" placeholder="Any allergies, extra spicy, etc." style="min-height:50px;"></textarea>
+  </div>
+  <div class="order-total" id="orderTotal" style="display:none;">
+    <span>Estimated Total</span>
+    <span id="orderTotalValue">Le 0</span>
+  </div>
+  <div class="order-submit" id="orderSubmitWrap" style="display:none;">
+    <button class="btn btn-primary" id="orderSubmitBtn">Send Order via WhatsApp</button>
+  </div>
+</div>
+
+<!-- ORDER FAB -->
+<button class="order-fab" id="orderFab" aria-label="View your order">
+  <i data-lucide="shopping-bag" width="24" height="24"></i>
+  <span class="order-fab-count" id="orderFabCount">0</span>
+</button>
+
+<script>
+// ─── INITIALIZE LUCIDE ICONS ───
+lucide.createIcons();
+
+// ─── CUSTOM CURSOR ───
+const cursorDot = document.getElementById('cursorDot');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursorDot.style.left = mouseX + 'px';
+  cursorDot.style.top = mouseY + 'px';
+});
+
+function animateCursor() {
+  ringX += (mouseX - ringX) * 0.12;
+  ringY += (mouseY - ringY) * 0.12;
+  cursorRing.style.left = ringX + 'px';
+  cursorRing.style.top = ringY + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+document.querySelectorAll('a, button, .menu-item').forEach(el => {
+  el.addEventListener('mouseenter', () => cursorRing.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering'));
+});
+
+// ─── PRELOADER ───
+const preloader = document.getElementById('preloader');
+const tl = gsap.timeline();
+
+tl.to('.preloader-img', { opacity: 1, duration: 0.6, ease: 'power2.out' })
+  .to('.preloader-logo', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.3')
+  .to('.preloader-line', { width: '120px', duration: 1, ease: 'power4.inOut' }, '-=0.3')
+  .to('.preloader', {
+    opacity: 0,
+    duration: 0.6,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      preloader.style.display = 'none';
+      animateHero();
+    }
+  }, '+=0.3');
+
+// ─── HERO ANIMATION ───
+function animateHero() {
+  const heroTl = gsap.timeline();
+
+  heroTl.to('.hero-logo', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' })
+  .to('.hero-title .line-inner', {
+    y: 0,
+    duration: 1.2,
+    ease: 'power4.out',
+    stagger: 0.15
+  })
+  .to('.hero-overline', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.6')
+  .to('.hero-divider', {
+    opacity: 1,
+    scaleX: 1,
+    duration: 0.8,
+    ease: 'power4.inOut'
+  }, '-=0.4')
+  .to('.hero-subtitle', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.4')
+  .to('.hero-ctas', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.4')
+  .to('.hero-scroll', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.2');
+}
+
+// ─── SCROLL-TRIGGERED REVEALS ───
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.to(el, {
+    opacity: 1,
+    y: 0,
+    duration: 0.9,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+      once: true
+    }
+  });
+});
+
+gsap.utils.toArray('.reveal-left').forEach(el => {
+  gsap.to(el, {
+    opacity: 1,
+    x: 0,
+    duration: 1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+      once: true
+    }
+  });
+});
+
+gsap.utils.toArray('.reveal-right').forEach(el => {
+  gsap.to(el, {
+    opacity: 1,
+    x: 0,
+    duration: 1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+      once: true
+    }
+  });
+});
+
+// ─── NAV SCROLL EFFECT ───
+const nav = document.getElementById('mainNav');
+ScrollTrigger.create({
+  start: 80,
+  onUpdate: (self) => {
+    nav.classList.toggle('scrolled', self.scroll() > 80);
+  }
+});
+
+// ─── MOBILE MENU ───
+const menuToggle = document.getElementById('menuToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('active');
+  mobileMenu.classList.toggle('active');
+  document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+});
+
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    menuToggle.classList.remove('active');
+    mobileMenu.classList.remove('active');
+    document.body.style.overflow = '';
+  });
+});
+
+// ─── SMOOTH SCROLL ───
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      gsap.to(window, { scrollTo: { y: target, offsetY: 80 }, duration: 1, ease: 'power3.inOut' });
+    }
+  });
+});
+
+document.getElementById('heroScroll').addEventListener('click', () => {
+  gsap.to(window, { scrollTo: { y: '#menu', offsetY: 80 }, duration: 1, ease: 'power3.inOut' });
+});
+
+// ─── MENU TABS ───
+const menuTabs = document.querySelectorAll('.menu-tab');
+const menuPanels = document.querySelectorAll('.menu-panel');
+
+// Auto-select today's day (no Sunday menu — default to Monday if Sunday)
+const days = ['monday','monday','tuesday','wednesday','thursday','friday','saturday'];
+const today = days[new Date().getDay()];
+const todayTab = document.querySelector(`.menu-tab[data-day="${today}"]`);
+if (todayTab) {
+  menuTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+  menuPanels.forEach(p => p.classList.remove('active'));
+  todayTab.classList.add('active');
+  todayTab.setAttribute('aria-selected', 'true');
+  todayTab.innerHTML += ' <span style="font-size:0.55rem;background:var(--gold);color:var(--black);padding:2px 6px;margin-left:4px;letter-spacing:0.08em;vertical-align:middle;">TODAY</span>';
+  const todayPanel = document.querySelector(`[data-panel="${today}"]`);
+  if (todayPanel) todayPanel.classList.add('active');
+}
+
+menuTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    menuTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+    menuPanels.forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    document.querySelector(`[data-panel="${tab.dataset.day}"]`).classList.add('active');
+    // Re-bind add buttons for the newly visible panel
+    bindAddButtons();
+  });
+});
+
+// ─── ORDER SYSTEM ───
+const orderState = { items: [] };
+const orderPanel = document.getElementById('orderPanel');
+const orderOverlay = document.getElementById('orderOverlay');
+const orderFab = document.getElementById('orderFab');
+const orderFabCount = document.getElementById('orderFabCount');
+const orderItemsEl = document.getElementById('orderItems');
+const orderForm = document.getElementById('orderForm');
+const orderTotal = document.getElementById('orderTotal');
+const orderTotalValue = document.getElementById('orderTotalValue');
+const orderSubmitWrap = document.getElementById('orderSubmitWrap');
+
+function openOrder() {
+  orderPanel.classList.add('open');
+  orderOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeOrder() {
+  orderPanel.classList.remove('open');
+  orderOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+orderFab.addEventListener('click', openOrder);
+document.getElementById('orderClose').addEventListener('click', closeOrder);
+orderOverlay.addEventListener('click', closeOrder);
+
+function updateOrderUI() {
+  const count = orderState.items.reduce((sum, i) => sum + i.qty, 0);
+  orderFabCount.textContent = count;
+  orderFabCount.classList.toggle('visible', count > 0);
+
+  // Sync menu-row visual state every time (runs even when cart is empty)
+  document.querySelectorAll('.menu-item').forEach(menuItem => {
+    const name = menuItem.dataset.name;
+    const inOrder = orderState.items.some(i => i.name === name);
+    menuItem.classList.toggle('selected', inOrder);
+    const btn = menuItem.querySelector('.menu-item-add');
+    if (btn) {
+      btn.classList.toggle('added', inOrder);
+      btn.textContent = inOrder ? '\u2713' : '+';
+      btn.setAttribute('aria-label', inOrder ? 'Remove from order' : 'Add to order');
+    }
+  });
+
+  if (orderState.items.length === 0) {
+    orderItemsEl.innerHTML = '<p class="order-empty">Your order is empty. Tap any dish to add it &mdash; tap again to remove.</p>';
+    orderForm.style.display = 'none';
+    orderTotal.style.display = 'none';
+    orderSubmitWrap.style.display = 'none';
+    return;
+  }
+
+  orderForm.style.display = 'block';
+  orderTotal.style.display = 'flex';
+  orderSubmitWrap.style.display = 'block';
+
+  let total = 0;
+  orderItemsEl.innerHTML = orderState.items.map((item, idx) => {
+    total += item.price * item.qty;
+    return `
+      <div class="order-item">
+        <div class="order-item-info">
+          <div class="order-item-name">${item.name}</div>
+          <div class="order-item-price">${item.price > 0 ? 'Le ' + item.price : 'Market Price'}</div>
+        </div>
+        <div class="order-item-qty">
+          <button class="qty-btn" onclick="changeQty(${idx}, -1)" aria-label="Decrease quantity">&minus;</button>
+          <span class="qty-value">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${idx}, 1)" aria-label="Increase quantity">+</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  orderTotalValue.textContent = total > 0 ? `Le ${total}` : 'Market Price';
+}
+
+window.changeQty = function(idx, delta) {
+  orderState.items[idx].qty += delta;
+  if (orderState.items[idx].qty <= 0) {
+    orderState.items.splice(idx, 1);
+  }
+  updateOrderUI();
+};
+
+// Toggle order from menu items — click to add, click again to remove (entire row is clickable)
+function bindAddButtons() {
+  document.querySelectorAll('.menu-item').forEach(row => {
+    // Remove old listeners by cloning
+    const newRow = row.cloneNode(true);
+    row.parentNode.replaceChild(newRow, row);
+
+    newRow.addEventListener('click', function(e) {
+      e.preventDefault();
+      const name = this.dataset.name;
+      const price = parseInt(this.dataset.price) || 0;
+      if (!name) return;
+
+      const existingIdx = orderState.items.findIndex(i => i.name === name);
+      const addBtn = this.querySelector('.menu-item-add');
+
+      if (existingIdx >= 0) {
+        // Already in cart → remove it (deselect)
+        orderState.items.splice(existingIdx, 1);
+        updateOrderUI();
+        // Deselect feedback
+        if (addBtn) {
+          gsap.fromTo(addBtn, { scale: 0.7 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' });
+        }
+      } else {
+        // Not in cart → add it
+        orderState.items.push({ name, price, qty: 1 });
+        updateOrderUI();
+        // Add feedback
+        if (addBtn) {
+          gsap.fromTo(addBtn, { scale: 1.3 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' });
+        }
+        // Brief row flash on add only
+        gsap.fromTo(this, { backgroundColor: 'rgba(198, 168, 75, 0.18)' }, { backgroundColor: 'rgba(198, 168, 75, 0)', duration: 0.5, ease: 'power2.out', clearProps: 'backgroundColor' });
+      }
+    });
+  });
+}
+bindAddButtons();
+
+// WhatsApp submit
+document.getElementById('orderSubmitBtn').addEventListener('click', () => {
+  const name = document.getElementById('orderName').value.trim();
+  const phone = document.getElementById('orderPhone').value.trim();
+  const address = document.getElementById('orderAddress').value.trim();
+  const notes = document.getElementById('orderNotes').value.trim();
+
+  if (!name || !phone) {
+    alert('Please enter your name and phone number.');
+    return;
+  }
+
+  let msg = `*New Order from Cokie's Website*\n\n`;
+  msg += `*Name:* ${name}\n`;
+  msg += `*Phone:* ${phone}\n`;
+  if (address) msg += `*Delivery Address:* ${address}\n`;
+  msg += `\n*Items:*\n`;
+
+  let total = 0;
+  orderState.items.forEach(item => {
+    const lineTotal = item.price * item.qty;
+    total += lineTotal;
+    msg += `- ${item.name} x${item.qty}`;
+    msg += item.price > 0 ? ` (Le ${lineTotal})\n` : ` (Market Price)\n`;
+  });
+
+  msg += `\n*Estimated Total:* ${total > 0 ? 'Le ' + total : 'Market Price'}`;
+  if (notes) msg += `\n*Notes:* ${notes}`;
+
+  const encoded = encodeURIComponent(msg);
+  window.open(`https://wa.me/23272161919?text=${encoded}`, '_blank');
+});
+
+// ─── HERO PARTICLES ───
+const canvas = document.getElementById('heroParticles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = -Math.random() * 0.4 - 0.1;
+    this.opacity = Math.random() * 0.4 + 0.1;
+    this.fadeSpeed = Math.random() * 0.003 + 0.001;
+    this.growing = Math.random() > 0.5;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.opacity += this.growing ? this.fadeSpeed : -this.fadeSpeed;
+    if (this.opacity >= 0.5) this.growing = false;
+    if (this.opacity <= 0.05) this.growing = true;
+    if (this.y < -10 || this.x < -10 || this.x > canvas.width + 10) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(198, 168, 75, ${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 40; i++) particles.push(new Particle());
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ─── PARALLAX ON HERO ───
+gsap.to('.hero-bg', {
+  yPercent: 30,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '.hero',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: true
+  }
+});
+
+// ─── STAGGER EXPERIENCE CARDS ───
+gsap.from('.exp-card', {
+  y: 60,
+  opacity: 0,
+  duration: 0.8,
+  ease: 'power3.out',
+  stagger: 0.15,
+  scrollTrigger: {
+    trigger: '.experience-cards',
+    start: 'top 80%',
+    once: true
+  }
+});
+
+// ─── STAGGER REVIEW CARDS ───
+gsap.from('.review-card', {
+  y: 40,
+  opacity: 0,
+  duration: 0.7,
+  ease: 'power3.out',
+  stagger: 0.12,
+  scrollTrigger: {
+    trigger: '.reviews-grid',
+    start: 'top 80%',
+    once: true
+  }
+});
+
+</script>
+</body>
+</html>
