@@ -857,6 +857,58 @@
   .menu-item.selected .menu-item-price {
     color: var(--gold);
   }
+  /* Inline quantity stepper for unit-priced items (Le X/piece, /pack, /bowl) */
+  .menu-item-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    background: rgba(198, 168, 75, 0.12);
+    border: 1px solid rgba(198, 168, 75, 0.4);
+    border-radius: 999px;
+    line-height: 1;
+  }
+  .menu-item-stepper .step-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--gold);
+    font-size: 0.95rem;
+    font-family: inherit;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.18s ease;
+    padding: 0;
+  }
+  .menu-item-stepper .step-btn:hover {
+    background: rgba(198, 168, 75, 0.22);
+    transform: scale(1.08);
+  }
+  .menu-item-stepper .step-btn:active { transform: scale(0.94); }
+  .menu-item-stepper .step-qty {
+    color: var(--gold);
+    font-weight: 600;
+    min-width: 1ch;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.92rem;
+  }
+  .menu-item-price .step-total {
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .menu-item-price .step-unit {
+    opacity: 0.55;
+    font-size: 0.78em;
+    margin-left: 0.4rem;
+    font-weight: 300;
+  }
   .menu-item-name {
     font-size: 0.9rem;
     font-weight: 300;
@@ -1066,7 +1118,7 @@
 
   .order-fab {
     position: fixed;
-    bottom: 2rem;
+    bottom: 4.5rem;
     right: 2rem;
     width: 60px;
     height: 60px;
@@ -1385,6 +1437,26 @@
     font-size: 0.75rem;
     color: var(--text-muted);
   }
+  .footer-bottom-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .footer-credit {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+  .footer-credit a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+  .footer-credit a:hover {
+    color: var(--gold-light);
+    opacity: 1;
+  }
   .footer-socials {
     display: flex;
     gap: 1rem;
@@ -1587,7 +1659,7 @@
 
     /* Order panel */
     .order-panel { width: 100vw; }
-    .order-fab { bottom: 1.25rem; right: 1.25rem; width: 52px; height: 52px; }
+    .order-fab { bottom: 3rem; right: 1.25rem; width: 52px; height: 52px; }
 
     /* Buttons */
     .btn { padding: 0.85rem 2rem; font-size: 0.65rem; }
@@ -1722,7 +1794,7 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
     .order-fab {
-      bottom: max(1.25rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+      bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.25rem));
       right: max(1.25rem, env(safe-area-inset-right));
     }
     footer {
@@ -2823,7 +2895,10 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <p>&copy; 2026 Cokie's Cookery & Bar. All rights reserved.</p>
+    <div class="footer-bottom-left">
+      <p>&copy; 2026 Cokie's Cookery & Bar. All rights reserved.</p>
+      <p class="footer-credit">Built and Powered by <a href="https://www.flotme.ai/" target="_blank" rel="noopener">Flot</a></p>
+    </div>
     <div class="footer-socials">
       <a href="https://www.instagram.com/cokiescookery/" target="_blank" rel="noopener" aria-label="Instagram">
         <i data-lucide="instagram" width="18" height="18"></i>
@@ -3089,6 +3164,24 @@ orderFab.addEventListener('click', openOrder);
 document.getElementById('orderClose').addEventListener('click', closeOrder);
 orderOverlay.addEventListener('click', closeOrder);
 
+// Capture each row's original price text and dish label once; flag unit-priced rows
+function ensureRowMeta(row) {
+  if (row.dataset.metaInit === '1') return;
+  const priceEl = row.querySelector('.menu-item-price');
+  const nameEl = row.querySelector('.menu-item-name');
+  if (priceEl && !priceEl.dataset.original) {
+    priceEl.dataset.original = priceEl.textContent.trim();
+    if (/\//.test(priceEl.dataset.original)) row.dataset.unitPriced = '1';
+  }
+  if (nameEl && !nameEl.dataset.label) {
+    const btn = nameEl.querySelector('.menu-item-add');
+    let label = '';
+    nameEl.childNodes.forEach(n => { if (n !== btn) label += n.textContent; });
+    nameEl.dataset.label = label.trim();
+  }
+  row.dataset.metaInit = '1';
+}
+
 function updateOrderUI() {
   const count = orderState.items.reduce((sum, i) => sum + i.qty, 0);
   orderFabCount.textContent = count;
@@ -3096,14 +3189,35 @@ function updateOrderUI() {
 
   // Sync menu-row visual state every time (runs even when cart is empty)
   document.querySelectorAll('.menu-item').forEach(menuItem => {
+    ensureRowMeta(menuItem);
     const name = menuItem.dataset.name;
-    const inOrder = orderState.items.some(i => i.name === name);
+    const price = parseInt(menuItem.dataset.price) || 0;
+    const cartItem = orderState.items.find(i => i.name === name);
+    const inOrder = !!cartItem;
+    const isUnit = menuItem.dataset.unitPriced === '1';
     menuItem.classList.toggle('selected', inOrder);
-    const btn = menuItem.querySelector('.menu-item-add');
-    if (btn) {
-      btn.classList.toggle('added', inOrder);
-      btn.textContent = inOrder ? '\u2713' : '+';
-      btn.setAttribute('aria-label', inOrder ? 'Remove from order' : 'Add to order');
+
+    const nameEl = menuItem.querySelector('.menu-item-name');
+    const priceEl = menuItem.querySelector('.menu-item-price');
+    if (!nameEl || !priceEl) return;
+    const label = nameEl.dataset.label || '';
+    const glyph = inOrder ? '\u2713' : '+';
+    const ariaLabel = inOrder ? 'Remove from order' : 'Add to order';
+
+    let nameHtml = `<button class="menu-item-add${inOrder ? ' added' : ''}" aria-label="${ariaLabel}">${glyph}</button> ${label}`;
+    if (isUnit && inOrder) {
+      nameHtml += ` <span class="menu-item-stepper">`
+        + `<button class="step-btn" data-step="-1" aria-label="Decrease quantity">&minus;</button>`
+        + `<span class="step-qty">${cartItem.qty}</span>`
+        + `<button class="step-btn" data-step="1" aria-label="Increase quantity">+</button>`
+        + `</span>`;
+    }
+    nameEl.innerHTML = nameHtml;
+
+    if (isUnit && inOrder && price > 0) {
+      priceEl.innerHTML = `<span class="step-total">Le ${price * cartItem.qty}</span><span class="step-unit">${priceEl.dataset.original}</span>`;
+    } else {
+      priceEl.textContent = priceEl.dataset.original || priceEl.textContent;
     }
   });
 
@@ -3155,12 +3269,34 @@ function bindAddButtons() {
     const newRow = row.cloneNode(true);
     row.parentNode.replaceChild(newRow, row);
 
+    ensureRowMeta(newRow);
+
     newRow.addEventListener('click', function(e) {
-      e.preventDefault();
       const name = this.dataset.name;
       const price = parseInt(this.dataset.price) || 0;
       if (!name) return;
 
+      // Stepper button on a unit-priced row — adjust qty without toggling row
+      const stepBtn = e.target.closest('.step-btn');
+      if (stepBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const delta = parseInt(stepBtn.dataset.step) || 0;
+        const cartIdx = orderState.items.findIndex(i => i.name === name);
+        if (cartIdx >= 0) {
+          orderState.items[cartIdx].qty += delta;
+          if (orderState.items[cartIdx].qty <= 0) {
+            orderState.items.splice(cartIdx, 1);
+          }
+          updateOrderUI();
+          // Bounce the qty number for feedback
+          const qtyEl = this.querySelector('.step-qty');
+          if (qtyEl) gsap.fromTo(qtyEl, { scale: 1.4 }, { scale: 1, duration: 0.25, ease: 'back.out(2)' });
+        }
+        return;
+      }
+
+      e.preventDefault();
       const existingIdx = orderState.items.findIndex(i => i.name === name);
       const addBtn = this.querySelector('.menu-item-add');
 
