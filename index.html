@@ -1118,7 +1118,7 @@
 
   .order-fab {
     position: fixed;
-    bottom: 4.5rem;
+    bottom: 2rem;
     right: 2rem;
     width: 60px;
     height: 60px;
@@ -1131,8 +1131,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s var(--ease-smooth);
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.3s, box-shadow 0.3s;
     box-shadow: 0 4px 24px rgba(198, 168, 75, 0.3);
+  }
+  .order-fab.hidden {
+    opacity: 0;
+    transform: translateY(20px) scale(0.85);
+    pointer-events: none;
   }
   .order-fab:hover { transform: scale(1.08); }
   .order-fab:active { transform: scale(0.96); }
@@ -1659,7 +1664,7 @@
 
     /* Order panel */
     .order-panel { width: 100vw; }
-    .order-fab { bottom: 3rem; right: 1.25rem; width: 52px; height: 52px; }
+    .order-fab { bottom: 1.25rem; right: 1.25rem; width: 52px; height: 52px; }
 
     /* Buttons */
     .btn { padding: 0.85rem 2rem; font-size: 0.65rem; }
@@ -1794,7 +1799,7 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
     .order-fab {
-      bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.25rem));
+      bottom: max(1.25rem, calc(env(safe-area-inset-bottom) + 0.5rem));
       right: max(1.25rem, env(safe-area-inset-right));
     }
     footer {
@@ -3161,6 +3166,18 @@ function closeOrder() {
 }
 
 orderFab.addEventListener('click', openOrder);
+
+// Hide FAB when the footer is in view, restore when scrolled away
+(function() {
+  const footerEl = document.querySelector('footer');
+  if (!footerEl || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      orderFab.classList.toggle('hidden', entry.isIntersecting);
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.01 });
+  io.observe(footerEl);
+})();
 document.getElementById('orderClose').addEventListener('click', closeOrder);
 orderOverlay.addEventListener('click', closeOrder);
 
