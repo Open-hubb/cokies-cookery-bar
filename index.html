@@ -200,6 +200,7 @@
     gap: 2.5rem;
     list-style: none;
     align-items: center;
+    flex-wrap: nowrap;
   }
   .nav-links a {
     font-family: var(--font-body);
@@ -213,6 +214,7 @@
     padding: 0.25rem 0;
     cursor: pointer;
     transition: color 0.3s;
+    white-space: nowrap;
   }
   .nav-links a::after {
     content: '';
@@ -242,6 +244,7 @@
     border: 1px solid var(--gold);
     transition: background 0.3s, color 0.3s, transform 0.3s var(--ease-smooth) !important;
     cursor: pointer;
+    white-space: nowrap;
   }
   .nav-cta:hover {
     background: transparent;
@@ -299,7 +302,7 @@
   }
   .mobile-menu a:hover { color: var(--gold); }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1024px) {
     .nav-links { display: none; }
     .menu-toggle { display: flex; }
     nav { padding: 1.2rem 1.5rem; }
@@ -467,6 +470,10 @@
     gap: 0.75rem;
     opacity: 0;
     cursor: pointer;
+  }
+  /* Hide scroll cue on viewports where the hero CTAs would collide with it */
+  @media (max-width: 1024px), (max-height: 820px) {
+    .hero-scroll { display: none; }
   }
   .hero-scroll span {
     font-size: 0.6rem;
