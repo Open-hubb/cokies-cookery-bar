@@ -1122,6 +1122,14 @@
     width: 100%;
     text-align: center;
   }
+  .order-submit-hint {
+    margin-top: 0.75rem;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
 
   .order-fab {
     position: fixed;
@@ -2948,7 +2956,8 @@
     <span id="orderTotalValue">Le 0</span>
   </div>
   <div class="order-submit" id="orderSubmitWrap" style="display:none;">
-    <button class="btn btn-primary" id="orderSubmitBtn">Send Order via WhatsApp</button>
+    <button class="btn btn-primary" id="orderSubmitBtn">Continue to Payment</button>
+    <p class="order-submit-hint">You'll be sent to our secure Flot payment page. Your order details are also forwarded to the kitchen via WhatsApp.</p>
   </div>
 </div>
 
@@ -3345,6 +3354,9 @@ function bindAddButtons() {
 bindAddButtons();
 
 // WhatsApp submit
+// Cokie's Flot payment page. Update the slug here if Cokie's merchant link changes.
+const FLOT_PAY_URL = 'https://pay.flotme.ai/cokies';
+
 document.getElementById('orderSubmitBtn').addEventListener('click', () => {
   const name = document.getElementById('orderName').value.trim();
   const phone = document.getElementById('orderPhone').value.trim();
@@ -3353,6 +3365,10 @@ document.getElementById('orderSubmitBtn').addEventListener('click', () => {
 
   if (!name || !phone) {
     alert('Please enter your name and phone number.');
+    return;
+  }
+  if (orderState.items.length === 0) {
+    alert('Your order is empty. Tap any dish to add it.');
     return;
   }
 
@@ -3372,9 +3388,13 @@ document.getElementById('orderSubmitBtn').addEventListener('click', () => {
 
   msg += `\n*Estimated Total:* ${total > 0 ? 'Le ' + total : 'Market Price'}`;
   if (notes) msg += `\n*Notes:* ${notes}`;
+  msg += `\n\n_Customer is being redirected to Flot to complete payment._`;
 
   const encoded = encodeURIComponent(msg);
-  window.open(`https://wa.me/23272161919?text=${encoded}`, '_blank');
+  // Send order details to the kitchen via WhatsApp in a new tab so they can prep the order…
+  window.open(`https://wa.me/23272161919?text=${encoded}`, '_blank', 'noopener');
+  // …then send the customer straight to the Flot payment page in the current tab.
+  window.location.href = FLOT_PAY_URL;
 });
 
 // ─── HERO PARTICLES ───
