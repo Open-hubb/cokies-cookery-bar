@@ -1135,7 +1135,7 @@
   .pay-modal {
     position: fixed;
     inset: 0;
-    z-index: 3000;
+    z-index: 10100;
     background: rgba(0, 0, 0, 0.78);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
@@ -3066,7 +3066,7 @@
         <div class="pay-modal-spinner"></div>
         <span>Loading secure checkout&hellip;</span>
       </div>
-      <iframe class="pay-modal-iframe" id="payModalIframe" title="Flot secure payment" allow="payment *" referrerpolicy="origin"></iframe>
+      <iframe class="pay-modal-iframe" id="payModalIframe" title="Flot secure payment" allow="payment 'src'; clipboard-write" referrerpolicy="origin" loading="lazy"></iframe>
     </div>
   </div>
 </div>
@@ -3546,6 +3546,9 @@ const payModalLoading = document.getElementById('payModalLoading');
 const payModalClose = document.getElementById('payModalClose');
 
 function openPayModal(url) {
+  // Close the order panel and hide the FAB so the checkout has full focus
+  if (typeof closeOrder === 'function') closeOrder();
+  orderFab.classList.add('hidden');
   payModalLoading.classList.remove('hidden');
   payModalIframe.src = url;
   payModal.classList.add('visible');
@@ -3555,6 +3558,8 @@ function closePayModal() {
   payModal.classList.remove('visible');
   payModalIframe.src = 'about:blank';
   document.body.style.overflow = '';
+  // Restore FAB visibility (footer-watcher will re-hide it if footer is in view)
+  orderFab.classList.remove('hidden');
 }
 payModalClose.addEventListener('click', closePayModal);
 payModal.addEventListener('click', (e) => {
