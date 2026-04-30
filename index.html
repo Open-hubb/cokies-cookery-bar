@@ -1131,6 +1131,131 @@
     letter-spacing: 0.02em;
   }
 
+  /* ─── Flot payment modal (iframe checkout) ─── */
+  .pay-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.75rem, 3vw, 2rem);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .pay-modal.visible {
+    display: flex;
+    opacity: 1;
+  }
+  .pay-modal-shell {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: min(720px, 92vh);
+    background: var(--black-rich, #0a0a0a);
+    border: 1px solid rgba(198, 168, 75, 0.3);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(198, 168, 75, 0.08);
+    transform: translateY(16px) scale(0.98);
+    transition: transform 0.35s var(--ease-smooth, ease);
+  }
+  .pay-modal.visible .pay-modal-shell { transform: none; }
+  .pay-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem 0.85rem 1.25rem;
+    border-bottom: 1px solid rgba(198, 168, 75, 0.18);
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .pay-modal-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin: 0;
+  }
+  .pay-modal-title span {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: var(--font-body);
+    margin-left: 0.5rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .pay-modal-close {
+    background: transparent;
+    border: 1px solid rgba(198, 168, 75, 0.3);
+    color: var(--gold);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .pay-modal-close:hover {
+    background: rgba(198, 168, 75, 0.15);
+    transform: rotate(90deg);
+  }
+  .pay-modal-body {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 53px);
+    background: #0a0a0a;
+  }
+  .pay-modal-iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #0a0a0a;
+  }
+  .pay-modal-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .pay-modal-loading.hidden { opacity: 0; }
+  .pay-modal-spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(198, 168, 75, 0.18);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: paySpin 0.9s linear infinite;
+  }
+  @keyframes paySpin { to { transform: rotate(360deg); } }
+  @media (max-width: 600px) {
+    .pay-modal { padding: 0; }
+    .pay-modal-shell {
+      max-width: none;
+      height: 100vh;
+      height: 100svh;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+    }
+  }
+
   .order-fab {
     position: fixed;
     bottom: 2rem;
@@ -2929,6 +3054,23 @@
   </div>
 </footer>
 
+<!-- FLOT PAYMENT MODAL -->
+<div class="pay-modal" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
+  <div class="pay-modal-shell">
+    <div class="pay-modal-header">
+      <h4 class="pay-modal-title" id="payModalTitle">Secure Checkout <span>via Flot</span></h4>
+      <button class="pay-modal-close" id="payModalClose" aria-label="Close payment window">&times;</button>
+    </div>
+    <div class="pay-modal-body">
+      <div class="pay-modal-loading" id="payModalLoading">
+        <div class="pay-modal-spinner"></div>
+        <span>Loading secure checkout&hellip;</span>
+      </div>
+      <iframe class="pay-modal-iframe" id="payModalIframe" title="Flot secure payment" allow="payment *" referrerpolicy="origin"></iframe>
+    </div>
+  </div>
+</div>
+
 <!-- ORDER PANEL -->
 <div class="order-panel-overlay" id="orderOverlay"></div>
 <div class="order-panel" id="orderPanel">
@@ -2957,7 +3099,7 @@
   </div>
   <div class="order-submit" id="orderSubmitWrap" style="display:none;">
     <button class="btn btn-primary" id="orderSubmitBtn">Continue to Payment</button>
-    <p class="order-submit-hint">You'll be sent to our secure Flot payment page. Your order details are also forwarded to the kitchen via WhatsApp.</p>
+    <p class="order-submit-hint">Pay securely with Flot &mdash; no new tabs. Your order details are also forwarded to the kitchen via WhatsApp.</p>
   </div>
 </div>
 
@@ -3355,7 +3497,7 @@ bindAddButtons();
 
 // WhatsApp submit
 // Cokie's Flot payment page. Update the slug here if Cokie's merchant link changes.
-const FLOT_PAY_URL = 'https://pay.flotme.ai/cokies';
+const FLOT_PAY_URL = 'https://pay.flotme.ai/cookies';
 
 document.getElementById('orderSubmitBtn').addEventListener('click', () => {
   const name = document.getElementById('orderName').value.trim();
@@ -3393,8 +3535,36 @@ document.getElementById('orderSubmitBtn').addEventListener('click', () => {
   const encoded = encodeURIComponent(msg);
   // Send order details to the kitchen via WhatsApp in a new tab so they can prep the order…
   window.open(`https://wa.me/23272161919?text=${encoded}`, '_blank', 'noopener');
-  // …then send the customer straight to the Flot payment page in the current tab.
-  window.location.href = FLOT_PAY_URL;
+  // …then open the Flot checkout inside an in-page modal (same browser, no new tab).
+  openPayModal(FLOT_PAY_URL);
+});
+
+// ─── Flot payment modal ───
+const payModal = document.getElementById('payModal');
+const payModalIframe = document.getElementById('payModalIframe');
+const payModalLoading = document.getElementById('payModalLoading');
+const payModalClose = document.getElementById('payModalClose');
+
+function openPayModal(url) {
+  payModalLoading.classList.remove('hidden');
+  payModalIframe.src = url;
+  payModal.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closePayModal() {
+  payModal.classList.remove('visible');
+  payModalIframe.src = 'about:blank';
+  document.body.style.overflow = '';
+}
+payModalClose.addEventListener('click', closePayModal);
+payModal.addEventListener('click', (e) => {
+  if (e.target === payModal) closePayModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && payModal.classList.contains('visible')) closePayModal();
+});
+payModalIframe.addEventListener('load', () => {
+  payModalLoading.classList.add('hidden');
 });
 
 // ─── HERO PARTICLES ───
