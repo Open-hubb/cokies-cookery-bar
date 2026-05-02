@@ -969,6 +969,8 @@
     width: 420px;
     max-width: 100vw;
     height: 100vh;
+    height: 100svh;
+    height: 100dvh;
     background: var(--black-card);
     border-left: 1px solid rgba(198, 168, 75, 0.15);
     z-index: 2000;
@@ -977,6 +979,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .order-panel.open { transform: translateX(0); }
   .order-panel-overlay {
@@ -1117,6 +1120,7 @@
   }
   .order-submit {
     margin: 1rem 2rem 2rem;
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .order-submit .btn {
     width: 100%;
@@ -1891,7 +1895,7 @@
     .order-form { padding: 1rem 1.25rem; }
     .order-form input, .order-form textarea { font-size: 0.85rem; padding: 0.65rem 0.75rem; }
     .order-total { padding: 0.75rem 1.25rem; font-size: 1rem; }
-    .order-submit { margin: 0.75rem 1.25rem 1.25rem; }
+    .order-submit { margin: 0.75rem 1.25rem 1.5rem; padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
 
     /* Mobile menu */
     .mobile-menu a { font-size: 1.6rem; gap: 2rem; }
@@ -3099,7 +3103,7 @@
   </div>
   <div class="order-submit" id="orderSubmitWrap" style="display:none;">
     <button class="btn btn-primary" id="orderSubmitBtn">Continue to Payment</button>
-    <p class="order-submit-hint">Pay securely with Flot &mdash; no new tabs. Your order details are also forwarded to the kitchen via WhatsApp.</p>
+    <p class="order-submit-hint">Secure checkout powered by <strong>Flot</strong> &mdash; pay right here without leaving the page.</p>
   </div>
 </div>
 
@@ -3502,8 +3506,6 @@ const FLOT_PAY_URL = 'https://pay.flotme.ai/cookies';
 document.getElementById('orderSubmitBtn').addEventListener('click', () => {
   const name = document.getElementById('orderName').value.trim();
   const phone = document.getElementById('orderPhone').value.trim();
-  const address = document.getElementById('orderAddress').value.trim();
-  const notes = document.getElementById('orderNotes').value.trim();
 
   if (!name || !phone) {
     alert('Please enter your name and phone number.');
@@ -3514,28 +3516,7 @@ document.getElementById('orderSubmitBtn').addEventListener('click', () => {
     return;
   }
 
-  let msg = `*New Order from Cokie's Website*\n\n`;
-  msg += `*Name:* ${name}\n`;
-  msg += `*Phone:* ${phone}\n`;
-  if (address) msg += `*Delivery Address:* ${address}\n`;
-  msg += `\n*Items:*\n`;
-
-  let total = 0;
-  orderState.items.forEach(item => {
-    const lineTotal = item.price * item.qty;
-    total += lineTotal;
-    msg += `- ${item.name} x${item.qty}`;
-    msg += item.price > 0 ? ` (Le ${lineTotal})\n` : ` (Market Price)\n`;
-  });
-
-  msg += `\n*Estimated Total:* ${total > 0 ? 'Le ' + total : 'Market Price'}`;
-  if (notes) msg += `\n*Notes:* ${notes}`;
-  msg += `\n\n_Customer is being redirected to Flot to complete payment._`;
-
-  const encoded = encodeURIComponent(msg);
-  // Send order details to the kitchen via WhatsApp in a new tab so they can prep the order…
-  window.open(`https://wa.me/23272161919?text=${encoded}`, '_blank', 'noopener');
-  // …then open the Flot checkout inside an in-page modal (same browser, no new tab).
+  // Go directly to the Flot checkout popup inside the page — no new tab.
   openPayModal(FLOT_PAY_URL);
 });
 
