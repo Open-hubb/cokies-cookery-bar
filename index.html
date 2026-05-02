@@ -3516,8 +3516,21 @@ document.getElementById('orderSubmitBtn').addEventListener('click', () => {
     return;
   }
 
+  // Compute cart total (excludes Market Price items where price = 0)
+  const cartTotal = orderState.items.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+  // Build Flot checkout URL with prefilled amount + a per-order reference.
+  // Flot reads: amount, currency (SLE), orderId — confirmed via its bundle.
+  const params = new URLSearchParams();
+  if (cartTotal > 0) {
+    params.set('amount', String(cartTotal));
+    params.set('currency', 'SLE');
+  }
+  params.set('orderId', 'COKIE-' + Date.now().toString(36).toUpperCase());
+  const url = FLOT_PAY_URL + (params.toString() ? '?' + params.toString() : '');
+
   // Go directly to the Flot checkout popup inside the page — no new tab.
-  openPayModal(FLOT_PAY_URL);
+  openPayModal(url);
 });
 
 // ─── Flot payment modal ───
