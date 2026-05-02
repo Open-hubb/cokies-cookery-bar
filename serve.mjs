@@ -1,6 +1,6 @@
 import { createServer } from 'http';
 import { readFile } from 'fs/promises';
-import { join, extname } from 'path';
+import { resolve, relative, isAbsolute, extname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -24,7 +24,25 @@ const MIME_TYPES = {
 };
 
 const server = createServer(async (req, res) => {
-  let filePath = join(__dirname, req.url === '/' ? 'index.html' : req.url);
+  // Strip query string + fragment, decode percent-escapes, then resolve safely
+  let urlPath;
+  try {
+    urlPath = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    return res.end('Bad Request');
+  }
+  if (urlPath === '/' || urlPath === '') urlPath = '/index.html';
+
+  // Resolve under __dirname and verify the result stays inside __dirname.
+  // path.join alone does NOT prevent traversal — relative() + isAbsolute() check does.
+  const filePath = resolve(__dirname, '.' + urlPath);
+  const rel = relative(__dirname, filePath);
+  if (rel.startsWith('..') || isAbsolute(rel)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    return res.end('Forbidden');
+  }
+
   const ext = extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
