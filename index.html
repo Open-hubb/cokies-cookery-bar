@@ -792,59 +792,6 @@
   }
   .menu-header .section-desc { margin: 0 auto; }
 
-  /* Featured-dish strip above the tabs */
-  .menu-feature-strip {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 0.75rem;
-    max-width: 1100px;
-    margin: 0 auto clamp(2.5rem, 5vh, 4rem);
-    padding: 0 0.5rem;
-  }
-  .menu-feature-img {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    border-radius: 4px;
-    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(198, 168, 75, 0.08);
-    transform: translateZ(0);
-  }
-  .menu-feature-img:first-child {
-    grid-row: span 2;
-    aspect-ratio: auto;
-  }
-  .menu-feature-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.8s var(--ease-smooth), filter 0.4s ease;
-    filter: saturate(1.05);
-  }
-  .menu-feature-img:hover img {
-    transform: scale(1.04);
-    filter: saturate(1.15);
-  }
-  .menu-feature-img::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.45));
-    pointer-events: none;
-  }
-  @media (max-width: 768px) {
-    .menu-feature-strip {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-    }
-    .menu-feature-img:first-child {
-      grid-column: span 2;
-      grid-row: auto;
-      aspect-ratio: 16 / 9;
-    }
-  }
-
   /* Day tabs */
   .menu-tabs {
     display: flex;
@@ -1399,6 +1346,14 @@
   }
   .gallery-marquee-wrapper {
     overflow: hidden;
+    margin: clamp(2rem, 5vh, 3.5rem) 0 clamp(2.5rem, 5vh, 4rem);
+  }
+  /* Allow the marquee to break out of any narrow container so it
+     still runs edge-to-edge inside the menu section. */
+  .menu-section .gallery-marquee-wrapper {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
   }
   .gallery-item {
     flex-shrink: 0;
@@ -2115,10 +2070,36 @@
       </p>
     </div>
 
-    <div class="menu-feature-strip reveal">
-      <div class="menu-feature-img"><img src="dishes/cokies-takeaway.jpg" alt="Signature Cokie's takeaway: jollof rice, grilled chicken and plantain" loading="lazy"></div>
-      <div class="menu-feature-img"><img src="dishes/grilled-fish-box.jpg" alt="Whole grilled fish with salad" loading="lazy"></div>
-      <div class="menu-feature-img"><img src="dishes/cassava-leaves.jpg" alt="Cassava leaves stew over rice" loading="lazy"></div>
+    <div class="gallery-marquee-wrapper reveal">
+      <div class="gallery-marquee">
+        <div class="gallery-item"><img src="dishes/cokies-takeaway.jpg" alt="Cokie's signature takeaway: jollof rice, grilled chicken and plantain" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/bbq-chicken.jpg" alt="Glazed barbecue chicken pieces straight off the grill" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/grilled-fish-box.jpg" alt="Whole grilled fish with salad and signature sauce" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/cassava-leaves.jpg" alt="Cassava leaves stew served over white rice" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/egusi-foofoo.jpg" alt="Egusi soup served with foofoo" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/grilled-prawns.jpg" alt="Marinated prawns grilling over open flame" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/couscous-platter.jpg" alt="Spicy couscous platter with chicken, plantain and salad" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/sierra-leone-salad.jpg" alt="Sierra Leonean tuna salad with eggs, beans and tomatoes" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/groundnut-soup.jpg" alt="Groundnut soup with foofoo balls and leaf-wrapped sides" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/grill-fire.jpg" alt="Marinated chicken pieces over a live charcoal fire" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/fried-rice-chicken.jpg" alt="Fried rice with grilled chicken, plantain and salad" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/cokies-jollof.jpg" alt="Cokie's jollof rice plate with grilled chicken" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/bbq-wings.jpg" alt="Smoky barbecue chicken wings on the grill" loading="lazy"></div>
+        <!-- Duplicate for seamless loop -->
+        <div class="gallery-item"><img src="dishes/cokies-takeaway.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/bbq-chicken.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/grilled-fish-box.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/cassava-leaves.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/egusi-foofoo.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/grilled-prawns.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/couscous-platter.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/sierra-leone-salad.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/groundnut-soup.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/grill-fire.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/fried-rice-chicken.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/cokies-jollof.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="gallery-item"><img src="dishes/bbq-wings.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+      </div>
     </div>
 
     <div class="menu-tabs reveal" role="tablist">
@@ -2930,47 +2911,6 @@
         <h3>Cocktails & Bar</h3>
         <p>From handcrafted cocktails to refreshing mocktails and smoothies, our bar caters to every palate. Don't miss our happy hour specials.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- GALLERY -->
-<section class="gallery section-pad" id="gallery">
-  <div class="section-narrow">
-    <div class="gallery-header">
-      <p class="section-overline reveal">A Taste of Cokie's</p>
-      <h2 class="section-title reveal">From Our Kitchen</h2>
-    </div>
-  </div>
-  <div class="gallery-marquee-wrapper">
-    <div class="gallery-marquee">
-      <div class="gallery-item"><img src="dishes/cokies-takeaway.jpg" alt="Cokie's signature takeaway: jollof rice, grilled chicken and plantain" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/bbq-chicken.jpg" alt="Glazed barbecue chicken pieces straight off the grill" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/cassava-leaves.jpg" alt="Cassava leaves stew served over white rice" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/grilled-fish-box.jpg" alt="Whole grilled fish with salad and signature sauce" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/egusi-foofoo.jpg" alt="Egusi soup served with foofoo" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/grilled-prawns.jpg" alt="Marinated prawns grilling over open flame" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/couscous-platter.jpg" alt="Spicy couscous platter with chicken, plantain and salad" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/sierra-leone-salad.jpg" alt="Sierra Leonean tuna salad with eggs, beans and tomatoes" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/groundnut-soup.jpg" alt="Groundnut soup with foofoo balls and leaf-wrapped sides" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/grill-fire.jpg" alt="Marinated chicken pieces over a live charcoal fire" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/fried-rice-chicken.jpg" alt="Fried rice with grilled chicken, plantain and salad" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/cokies-jollof.jpg" alt="Cokie's jollof rice plate with grilled chicken" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/bbq-wings.jpg" alt="Smoky barbecue chicken wings on the grill" loading="lazy"></div>
-      <!-- Duplicate for seamless loop -->
-      <div class="gallery-item"><img src="dishes/cokies-takeaway.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/bbq-chicken.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/cassava-leaves.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/grilled-fish-box.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/egusi-foofoo.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/grilled-prawns.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/couscous-platter.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/sierra-leone-salad.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/groundnut-soup.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/grill-fire.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/fried-rice-chicken.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/cokies-jollof.jpg" alt="" aria-hidden="true" loading="lazy"></div>
-      <div class="gallery-item"><img src="dishes/bbq-wings.jpg" alt="" aria-hidden="true" loading="lazy"></div>
     </div>
   </div>
 </section>
