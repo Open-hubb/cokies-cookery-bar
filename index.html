@@ -3080,7 +3080,7 @@
   </div>
   <div class="footer-bottom">
     <div class="footer-bottom-left">
-      <p>&copy; 2026 Cokie's Cookery & Bar. All rights reserved.</p>
+      <p>&copy; <span id="footerYear">2026</span> Cokie's Cookery &amp; Bar. All rights reserved.</p>
       <p class="footer-credit">Built and Powered by <a href="https://www.flotme.ai/" target="_blank" rel="noopener noreferrer">Flot</a></p>
     </div>
     <div class="footer-socials">
@@ -3340,6 +3340,12 @@ menuTabs.forEach(tab => {
 });
 
 // ─── ORDER SYSTEM ───
+// Keep the footer copyright year fresh on every visit, no yearly edit needed.
+(function () {
+  const yearEl = document.getElementById('footerYear');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+})();
+
 const orderState = { items: [] };
 
 // Escape any string before injecting into innerHTML templates.
